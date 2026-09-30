@@ -1,0 +1,199 @@
+/*
+ * The Problems tab.
+ *
+ * Rows are the panel's own rhythm rather than the tree's: a problem row carries
+ * a message that can be a full sentence, so it gets the panel's 13px body size
+ * and a little more vertical room than a 22px tree row.
+ */
+
+.problems {
+  height: 100%;
+  overflow-y: auto;
+}
+
+.problems-list {
+  margin: 0;
+  padding: var(--space-1) 0;
+  list-style: none;
+}
+
+/* A row is the open-it button plus a copy button beside it, so the two are
+   laid side by side and only the first one takes the width. */
+.problems-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding-right: var(--space-2);
+}
+
+.problems-copy {
+  flex: 0 0 auto;
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  /* Quiet until the row is under the pointer; a column of Copy buttons is
+     louder than the problems they belong to. */
+  opacity: 0;
+}
+
+.problems-list li:hover .problems-copy,
+.problems-copy:focus-visible {
+  opacity: 1;
+}
+
+.problems-copy:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.problems-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--row-height);
+  padding: 0 var(--space-3);
+  border: none;
+  border-radius: var(--radius-row);
+  background: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  line-height: 1.55;
+  text-align: left;
+  cursor: pointer;
+}
+
+.problems-row:hover {
+  background: var(--bg-tertiary);
+}
+
+.problems-row:focus-visible {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+.problems-icon {
+  align-self: center;
+  flex: 0 0 auto;
+}
+
+/* Severity is carried by colour AND by the icon's position in a sorted list, so
+   an error is distinguishable without relying on colour alone. */
+.problems-icon.is-error {
+  color: var(--error);
+}
+
+.problems-icon.is-warning {
+  color: var(--warning);
+}
+
+.problems-icon.is-info,
+.problems-icon.is-hint {
+  color: var(--text-muted);
+}
+
+/* The message takes the width and wraps: truncating a parser's message loses
+   the part that says what to do about it. */
+.problems-message {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.problems-where {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.problems-empty {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: 12px;
+}
+
+/* ---- Runtime errors (1.15.0) ---------------------------------------------
+   Visibly a SECOND list, not more rows on the first one: these have no line
+   number, are not clickable, and answer a different question. */
+
+.problems-runtime {
+  border-top: 1px solid var(--border-light);
+  margin-top: var(--space-1, 4px);
+}
+
+.problems-runtime-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.problems-runtime-refresh {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  font-weight: 400;
+  padding: 0 var(--space-2);
+  cursor: pointer;
+}
+
+.problems-runtime-refresh:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Shares the row LAYOUT and nothing else. Not a button — no hover, no pointer,
+   because a log line has no range to jump to — and deliberately NOT carrying
+   `.problems-row`, which the live suites count. */
+.problems-runtime-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--row-height);
+  padding: 0 var(--space-3);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.55;
+  text-align: left;
+  cursor: default;
+}
+
+.problems-trace {
+  display: block;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.problems-runtime-note {
+  margin: 0;
+  padding: 0 var(--space-3) var(--space-3);
+  font-size: var(--font-size-base);
+}
+
+/* Which gateway event scripts are failing (R2, 1.16.0). Above the individual
+   messages because the script is what you act on; the message is detail. */
+.problems-runtime-scripts {
+  margin: 0;
+  padding: 0 var(--space-3) var(--space-2);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--error);
+}

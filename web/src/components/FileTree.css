@@ -1,0 +1,358 @@
+/*
+ * The script tree.
+ *
+ * Consolidated in 1.3.0. Three generations of rules had stacked up here — a
+ * 22px row height declared twice, `.badge` styled twice with the later block
+ * silently winning, and a `.file-tree-leaf` treatment for a Script Console row
+ * that no longer exists. Duplicated declarations in one stylesheet are not
+ * harmless: the reader has no way to tell which one is in force without opening
+ * the browser, and the dead ones read as intent.
+ *
+ * Metrics are VS Code's: 22px rows, 13px labels, 11px uppercase headings.
+ */
+
+/* The scrolling region of the rail. Its width, background and right-hand border
+   belong to .workspace-rail; the tree takes the space the footer does not, and
+   min-height:0 is what lets it shrink to that instead of overflowing. */
+.file-tree {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-1) 0 var(--space-3);
+}
+
+.file-tree-group {
+  margin-bottom: var(--space-2);
+}
+
+.file-tree-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---- rows ---------------------------------------------------------------- */
+
+.file-tree-item,
+.file-tree-package,
+.file-tree-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: var(--row-height);
+  padding: 0 var(--space-2);
+  border: none;
+  /* The highlight behind a row takes the theme's row radius: 0 on
+     `newsprint-night`, 6px on the rounded packs. It is the shape the eye reads
+     most often in this app, which is why it has its own token rather than
+     borrowing the control radius. */
+  border-radius: var(--radius-row);
+  background: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-chrome);
+  text-align: left;
+  cursor: pointer;
+}
+
+.file-tree-item:hover,
+.file-tree-package:hover,
+.file-tree-header:hover {
+  background: var(--bg-tertiary);
+}
+
+.file-tree-item.is-selected {
+  background: var(--accent-primary-bg);
+}
+
+.file-tree-package {
+  color: var(--text-secondary);
+}
+
+.file-tree-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Section headings read as headings — the level above a folder rather than
+   another row in the list. */
+.file-tree-header {
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* A non-interactive heading (the Web Dev list has no collapse). */
+.file-tree-static {
+  cursor: default;
+}
+
+.file-tree-static:hover {
+  background: none;
+}
+
+.file-tree-icon {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+
+.file-tree-item.is-selected .file-tree-icon,
+.file-tree-item:hover .file-tree-icon {
+  color: var(--text-secondary);
+}
+
+.file-tree-chevron {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: var(--text-muted);
+}
+
+.file-tree-count {
+  margin-left: auto;
+  padding-left: var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.file-tree-empty {
+  padding: 0 var(--space-3);
+  margin: 0;
+  min-height: var(--row-height);
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-sm);
+}
+
+/* ---- gateway-event singletons -------------------------------------------- */
+
+/* A singleton that exists is bold; one that does not is dimmed. Measured off
+   the real Designer, which uses weight alone to say "this has been created". */
+.file-tree-name.is-defined {
+  font-weight: 600;
+}
+
+.file-tree-name.is-undefined {
+  color: var(--text-muted);
+}
+
+/* ---- Web Dev ------------------------------------------------------------- */
+
+/* A method an endpoint does not implement yet: visible, but clearly not there. */
+.file-tree-item.is-absent {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.file-tree-method {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- badges -------------------------------------------------------------- */
+
+/*
+ * Inheritance is not decoration — editing an inherited script creates a local
+ * override rather than changing the parent — so the badge stays. What went is
+ * the box: six boxed uppercase INHERITED badges down one rail were more ink
+ * than the script names they annotate, and the border said nothing the word
+ * did not (Nigel's UI standard: a signal that has to be explained is not one).
+ */
+.badge {
+  margin-left: auto;
+  padding: 0;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-style: italic;
+}
+
+.badge-override {
+  color: var(--warning);
+}
+
+/* "off" on a disabled event script. Upright, not italic: it is a state of the
+   script rather than a note about where it came from. */
+.badge-disabled {
+  color: var(--warning);
+  font-style: normal;
+}
+
+/* "legacy" on a version-1 named query. The ERROR colour, not the warning one:
+   the platform cannot read that resource at all and runNamedQuery raises on it,
+   so the row is broken rather than merely unusual. Upright, like "off", because
+   it is a state of the resource and not a note about where it came from. */
+.badge-legacy {
+  color: var(--error);
+  font-style: normal;
+}
+
+/* ---- row actions --------------------------------------------------------- */
+
+/* The header and its action button share a row, so the "+" sits on the section
+   it acts on rather than in a toolbar detached from it. */
+.file-tree-header-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.file-tree-header-row .file-tree-header {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* A row wraps the item button and its delete button. The delete button is a
+   SIBLING, never nested — a button inside a button is invalid HTML and the
+   inner one's click never reaches the handler in some browsers. */
+.file-tree-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.file-tree-row .file-tree-item {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.file-tree-action {
+  flex: 0 0 auto;
+  width: 22px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-row);
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-tree-action:hover,
+.file-tree-action:focus-visible {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.file-tree-delete:hover,
+.file-tree-delete:focus-visible {
+  color: var(--error);
+}
+
+/* Discarding an override is NOT destructive the way deleting is — the script
+   keeps working, inherited from the parent — so it does not take the error
+   colour. Accent instead: a real action, not a warning. */
+.file-tree-discard:hover,
+.file-tree-discard:focus-visible {
+  color: var(--accent-primary);
+}
+
+/* Delete, discard and add stay hidden until the row is hovered or something in
+   it has focus, so the rail is not a wall of icons — but they MUST appear on
+   keyboard focus too, or they are unreachable without a mouse. */
+.file-tree-delete,
+.file-tree-discard {
+  opacity: 0;
+}
+
+.file-tree-row:hover .file-tree-delete,
+.file-tree-row:hover .file-tree-discard,
+.file-tree-delete:focus-visible,
+.file-tree-discard:focus-visible {
+  opacity: 1;
+}
+
+/*
+ * A trailing note on a tree row — a file's size, or a text resource's MIME
+ * type.
+ *
+ * Right-aligned and quiet: it is context for the name beside it, not a second
+ * label. `margin-left: auto` rather than a fixed column, because the names it
+ * follows range from `doGet` to `three.min.js` and a column wide enough for the
+ * longest wastes the width on every other row.
+ */
+.file-tree-note {
+  margin-left: auto;
+  padding-left: 8px;
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ---- git marks ----------------------------------------------------------
+   One letter per row saying how the resource differs from the last commit.
+
+   `margin-left: auto` is deliberately NOT set here, unlike .badge: a row can
+   carry an origin badge AND a mark, and both claiming the free space put the
+   mark under the delete button. The mark sits after whatever else is there and
+   reserves a fixed width so a column of them lines up. */
+.git-mark {
+  flex: none;
+  width: 12px;
+  margin-left: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+}
+
+/* A row with no origin badge has nothing pushing the mark right, so the mark
+   takes the space itself. With a badge present the badge already did. */
+.file-tree-item > .git-mark:not(.badge + .git-mark),
+.file-tree-package > .git-mark {
+  margin-left: auto;
+}
+
+/* Colours are git's conventions, on this palette's existing four. Nothing new
+   is invented: an undefined custom property fails silently and inherits, which
+   is how a mark ends up the same colour as the row it is meant to stand out
+   from. */
+.git-mark-modified {
+  color: var(--warning);
+}
+
+.git-mark-added {
+  color: var(--success);
+}
+
+.git-mark-deleted {
+  color: var(--error);
+}
+
+/* Conflicted uses the error colour too, and earns its distinct look from the
+   glyph — "!" against "D" — rather than from a fifth colour nobody would learn.
+   Bolder because it is the one state that blocks work. */
+.git-mark-conflicted {
+  color: var(--error);
+  font-weight: 700;
+}
+
+/* The branch and change count, under the tree and above the footer. Muted:
+   it is context for what the tree is showing, not a control. */
+.git-summary {
+  flex: none;
+  margin: 0;
+  padding: 4px 12px;
+  overflow: hidden;
+  border-top: 1px solid var(--border-light);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* An unreadable repository is the one thing here that must not read as chrome:
+   a clean tree and an unreadable one otherwise look identical. */
+.git-summary.is-error {
+  color: var(--error);
+}

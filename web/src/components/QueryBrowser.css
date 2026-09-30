@@ -1,0 +1,411 @@
+/* The Database Query Browser. Toolbar above a schema tree beside a SQL editor,
+   with the results area below both — each result grid is its own bounded,
+   independently scrolling viewport with a sticky header, so several stack
+   without any of them paging or fighting the page for its own scrollbar. */
+
+.qb {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  height: 100%;
+  /* Same lit-ground treatment as .console and .app — see ScriptConsole.css's
+     comment on why this must be `fixed` rather than the default. */
+  background-color: var(--bg-primary);
+  background-image: var(--page-glow);
+  background-attachment: fixed;
+}
+
+.qb-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--rule-width) solid var(--border-light);
+  background: var(--bg-secondary);
+  flex: 0 0 auto;
+}
+
+.qb-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.qb-field select,
+.qb-field input {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+}
+
+/* "Max rows" is a handful of digits; a full-width number input would leave a
+   toolbar-sized field for four characters. */
+.qb-field input[type='number'] {
+  width: 6em;
+}
+
+.qb-spacer {
+  flex: 1 1 auto;
+}
+
+.qb-hint {
+  font-size: 12px;
+}
+
+/* Shared shape with console-denied, but its own class: a shared claim on a
+   class name belongs to ONE kind of notice, and this one is the execution
+   gate rather than the console's. */
+.qb-denied {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+.qb-fetch-error {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--error);
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+/* Auto-refresh turning itself off (E) is routine, not a failure — the same
+   shape as .qb-denied rather than the red .qb-fetch-error treatment. */
+.qb-autorefresh-note {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+/* "Saved as Named Query" confirmation (C) — a status line with its own
+   action(s), not a dialog: the save dialog has already closed by the time
+   this shows. */
+.qb-saved-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--accent-primary-bg);
+  color: var(--text-primary);
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+.qb-saved-notice button {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+}
+
+/* A schema heading (A) — shown only when a datasource has more than one
+   schema in play; the common single-schema case stays a flat list. */
+.qb-schema-group-name {
+  margin: var(--space-2) 0 0;
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Schema tree beside the editor, results below both — the ONE box the split
+   is measured against is the editor row, matching console-body's reasoning:
+   the toolbar and the notices above are not draggable and must not be
+   counted into the pane heights. */
+.qb-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.qb-editor-row {
+  display: flex;
+  flex: 1 1 42%;
+  min-height: 0;
+  border-bottom: var(--rule-width) solid var(--border-light);
+}
+
+.qb-schema {
+  flex: 0 0 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.qb-schema-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: var(--space-2);
+}
+
+.qb-schema-refresh {
+  flex: 0 0 auto;
+  width: var(--control-height);
+  height: var(--control-height);
+  padding: 0;
+}
+
+.qb-filter {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+}
+
+.qb-filter:focus-visible {
+  border-color: var(--accent-primary);
+}
+
+.qb-tree {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--space-1) var(--space-2);
+}
+
+.qb-tree-empty {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.qb-node-row {
+  display: flex;
+  align-items: center;
+}
+
+.qb-disclosure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.qb-disclosure:hover {
+  color: var(--text-primary);
+}
+
+.qb-table-name,
+.qb-column-name {
+  display: flex;
+  align-items: baseline;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qb-table-name:hover,
+.qb-column-name:hover {
+  background: var(--bg-tertiary);
+}
+
+/* Nested one level under its table, so the tree reads as a hierarchy without
+   needing real ARIA tree semantics to say so. */
+.qb-columns {
+  padding-left: var(--space-4);
+}
+
+.qb-col-type {
+  margin-left: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.qb-editor {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Same reasoning as .code-editor-host / .console-editor: CodeMirror draws no
+   outline of its own, so the pane that hosts it needs one for keyboard
+   users. */
+.qb-editor:focus-within {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+.qb-results {
+  flex: 1 1 58%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.qb-results-empty {
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+.qb-run-error {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--bg-secondary);
+  border: 1px solid var(--error);
+  border-radius: var(--radius);
+  color: var(--error);
+  font-size: var(--font-size-sm);
+}
+
+.qb-run-status {
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.qb-run-note {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-xs);
+}
+
+.qb-result {
+  min-height: 0;
+}
+
+.qb-result-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.qb-result-caption {
+  margin: 0;
+  font-size: var(--font-size-xs);
+}
+
+.qb-copy,
+.qb-export-csv {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  cursor: pointer;
+}
+
+.qb-affected {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+/* The failed-run block: the same console-block/console-error treatment
+   NamedQueryEditor already gives a failed test run, under this file's own
+   class so nothing here depends on ScriptConsole.css having loaded first. */
+.qb-error {
+  padding: var(--space-2);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--error);
+}
+
+.qb-error pre {
+  margin: 0 0 var(--space-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font: inherit;
+}
+
+/* Both axes scroll from the SAME box — see the component's own comment on
+   why a sticky header needs that. A real bounded height so several stacked
+   results each get a usable window rather than one consuming the panel. */
+.qb-scroll {
+  max-width: 100%;
+  max-height: min(320px, 42vh);
+  overflow: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+}
+
+.qb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.qb-table th,
+.qb-table td {
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.qb-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.qb-table td {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+/* A numeric column reads right-aligned even when the CELL travelled as a
+   JSON string — a big integer or NaN/Infinity does (see DbQueryRouteHandler's
+   H2/H3 Javadoc); the column is still numeric and should still line up. */
+.qb-table th.qb-col-numeric,
+.qb-table td.qb-col-numeric {
+  text-align: right;
+}

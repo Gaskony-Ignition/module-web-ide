@@ -1,0 +1,272 @@
+/*
+ * The Search view, inside the side rail.
+ *
+ * Same metrics as the script tree — 22px rows, 13px labels, 11px uppercase
+ * headings — because the two views swap in and out of the same column and a
+ * different rhythm between them reads as a different application.
+ */
+
+.search-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  /* Zero minimum, or the results list pushes the rail past the viewport instead
+     of scrolling inside it. */
+  min-height: 0;
+}
+
+.search-panel-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2);
+}
+
+.search-panel-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.search-panel-input:focus-within {
+  border-color: var(--accent-primary);
+}
+
+.search-panel-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+}
+
+/* No local override: the input takes the global focus ring (index.css) —
+   the wrapper's :focus-within border swap above was the only indicator,
+   and axe/a11y-check.js look for an actual outline, not a border colour. */
+
+.search-panel-case {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+/* The status line carries the "matched by NAME" caveat, so it wraps rather than
+   truncating — a caveat nobody can read is not a caveat. */
+.search-panel-status {
+  margin: 0;
+  padding: 0 var(--space-2) var(--space-2);
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.search-panel-results {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: var(--space-3);
+}
+
+.search-panel-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-panel-file {
+  position: sticky;
+  top: 0;
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  /* Opaque: a sticky heading must cover what scrolls under it. */
+  background: var(--bg-solid);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  /* The file name is the only way to tell two identical-looking hits apart, so
+     it truncates from the left: the tail of `util.helpers` identifies it. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl;
+  text-align: left;
+}
+
+.search-panel-hit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--row-height);
+  padding: 0 var(--space-2);
+  border: none;
+  border-radius: var(--radius-row);
+  background: none;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-chrome);
+  text-align: left;
+  cursor: pointer;
+}
+
+.search-panel-hit:hover {
+  background: var(--bg-tertiary);
+}
+
+.search-panel-hit:focus-visible {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+.search-panel-line {
+  flex: 0 0 auto;
+  min-width: 2.5ch;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: right;
+}
+
+/* One line, truncated at the right: a hit's leading indentation is kept (it is
+   most of what tells you which block you are looking at) and the tail is what
+   gets cut. */
+.search-panel-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+
+/* ---- Replace across the project (1.15.0) ----------------------------------
+   The row sits under the search form and only appears for a text search that
+   found something, so the panel is unchanged for a reader who is only looking.
+   Deliberately NOT the primary `.button`: the destructive control on this
+   screen should not be the brightest thing on it. */
+
+.search-panel-replace {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+/* Its own class, never a second `.search-panel-input` — see the note in the
+   TSX. The treatment is copied from that rule on purpose: the two boxes are a
+   pair and must read as one control. */
+.search-panel-replace-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+}
+
+.search-panel-replace-input:focus-within {
+  border-color: var(--accent-primary);
+}
+
+.search-panel-replace-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+}
+
+/* See .search-panel-input input above: global focus ring applies. */
+
+.search-panel-replace-button {
+  flex: 0 0 auto;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-panel-replace-button:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+}
+
+.search-panel-replace-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.search-panel-confirm,
+.search-panel-report {
+  margin: 0;
+  padding: 0 var(--space-3) var(--space-3);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* The one place this panel raises its voice: it is about to change files. */
+.search-panel-confirm {
+  color: var(--warning);
+}
+
+.search-panel-report-line {
+  margin: 0 0 var(--space-1, 4px);
+  color: var(--text-primary);
+}
+
+.search-panel-report-skip {
+  margin: 0;
+}
+
+.search-panel-report-file {
+  color: var(--text-secondary);
+}
+
+/* The unused-symbols button (1.16.0). A quiet control beside "Match case": it is
+   a report, not the panel's main job, and it takes a moment to run. */
+.search-panel-unused {
+  margin-left: auto;
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+}
+
+.search-panel-unused:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}

@@ -1,0 +1,305 @@
+/* Run history (R3, 1.16.0).
+
+   Deliberately shaped like ConflictDialog — same backdrop, same frosted panel,
+   same radius — because they are the same kind of moment: a decision about a
+   version of a file, taken over the top of the editor. A second dialog idiom
+   would make the app look like two apps. The border is the neutral one rather
+   than the conflict warning, because opening your own history is not a fault
+   condition. */
+
+.runhist-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+  z-index: 20;
+}
+
+.runhist-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(1000px, 100%);
+  height: min(640px, 100%);
+  min-height: 0;
+  padding: var(--space-5);
+  background: var(--glass-panel);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+}
+
+.runhist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.runhist-head h2 {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+.runhist-close {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: var(--font-size-code);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 var(--space-1, 4px);
+}
+
+.runhist-close:hover {
+  color: var(--text-primary);
+}
+
+/* The list is fixed-width and the preview takes the rest. `min-height: 0` on
+   both, or a flex child refuses to shrink below its content and the panel grows
+   past the window instead of scrolling inside it. */
+.runhist-body {
+  display: flex;
+  gap: var(--space-3);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.runhist-list {
+  flex: 0 0 260px;
+  min-height: 0;
+  /* A column, not a scrollport: the search row stays put and the list under it
+     scrolls. Scrolling the whole column would carry the filter off the top the
+     moment there was enough history to need it. */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+}
+
+.runhist-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.runhist-version {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 2px);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.runhist-version:hover {
+  background: var(--bg-tertiary);
+}
+
+.runhist-version.is-selected {
+  background: var(--accent-primary-bg);
+  box-shadow: inset 2px 0 0 var(--accent-primary);
+}
+
+.runhist-when {
+  font-variant-numeric: tabular-nums;
+}
+
+.runhist-meta {
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+}
+
+.runhist-preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.runhist-same {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+}
+
+.runhist-source {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-3);
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.runhist-empty {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: var(--font-size-base);
+}
+
+.runhist-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.runhist-note {
+  margin: 0;
+  font-size: var(--font-size-base);
+  max-width: 52ch;
+}
+
+.runhist-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* The list rows carry two lines: when it ran, and the first line of what ran —
+   which is what a person actually recognises a run by. */
+.runhist-first {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.runhist-run {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 2px);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.runhist-run:hover {
+  background: var(--bg-tertiary);
+}
+
+.runhist-run.is-selected {
+  background: var(--accent-primary-bg);
+  box-shadow: inset 2px 0 0 var(--accent-primary);
+}
+
+.runhist-mark {
+  display: inline-block;
+  width: 1.2em;
+}
+
+.runhist-mark.is-ok {
+  color: var(--success);
+}
+
+.runhist-mark.is-failed {
+  color: var(--error);
+}
+
+.runhist-detail {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  padding: var(--space-3);
+  gap: var(--space-2);
+}
+
+.runhist-section {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+.runhist-source,
+.runhist-output {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 4;
+}
+
+.runhist-output {
+  color: var(--text-secondary);
+}
+
+/* ── Search ────────────────────────────────────────────────────────────────
+   Same shape as the Search view's own input, deliberately: this is the second
+   place in the app that filters a list, and two filter boxes that look
+   different read as two different controls. */
+.runhist-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.runhist-filter {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+}
+
+.runhist-filter:focus-visible {
+  border-color: var(--accent-primary);
+}
+
+.runhist-count {
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}

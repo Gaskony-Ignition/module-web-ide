@@ -1,0 +1,199 @@
+.config-strip {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  /* Matches the toolbar via --bar-height, so a control has air around it at
+     every theme density. The
+     min-height rather than a fixed one: the docs variant of this strip is a
+     paragraph and has to be allowed to grow. */
+  min-height: var(--bar-height);
+  padding: var(--space-1) var(--space-3);
+  background: var(--bg-secondary);
+  border-bottom: var(--rule-width) solid var(--border-light);
+}
+
+.config-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.config-label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.config-field input[type='number'],
+.config-field select,
+.config-field input[type='text'] {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.config-field input[type='number'] {
+  width: 96px;
+}
+
+.config-save {
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  cursor: pointer;
+}
+
+.config-save:disabled {
+  border-color: var(--border-light);
+  color: var(--text-muted);
+  background: none;
+  cursor: default;
+}
+
+/* ---- Designer documentation (v1.1.0) ---- */
+
+/* The strip becomes a column once it carries prose: description first, then the
+   controls, matching the reading order of the Designer's own workspace. */
+.config-strip {
+  flex-wrap: wrap;
+}
+
+.config-docs {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.config-description {
+  margin: 0 0 var(--space-1);
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.config-params {
+  margin: 0 0 var(--space-2);
+  padding: 0;
+  font-size: 12px;
+}
+
+.config-param {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.config-param dt {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.config-param dd {
+  margin: 0;
+}
+
+.config-param-type {
+  margin-left: var(--space-1);
+  font-size: 11px;
+}
+
+.config-note {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 12px;
+}
+
+.config-cron {
+  font-family: var(--font-mono);
+  min-width: 160px;
+}
+
+/* The Designer's Fixed Delay / Fixed Rate pair. Inline, because it sits in a
+   strip beside the delay it qualifies and stacking it would break the row. */
+.config-radio-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.config-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.config-radio input {
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- a trailing field (v1.4.0) ------------------------------------------
+ *
+ * `Script Hint Scope` lives at the far right, small, the way the Designer puts
+ * it — top-right of the editor header, nowhere near the code. It is a setting
+ * most people never touch, and the strip should read that way.
+ *
+ * `order: 2` puts it after the save button, so it is the LAST thing on the row
+ * and sits hard against the right edge — which is where the Designer's is. The
+ * push comes from `.config-save`'s existing `margin-left: auto`: that absorbs
+ * the free space, and anything ordered after it follows on the right. Giving
+ * this field its own auto margin instead left it stranded mid-strip with the
+ * save button beyond it, which is the one place it must not be.
+ */
+.config-field-trailing {
+  order: 2;
+  gap: var(--space-2);
+}
+
+.config-field-trailing .config-label,
+.config-field-trailing select {
+  font-size: var(--font-size-xs);
+}
+
+/* Tighter than the strip's other controls on purpose: the size IS the signal
+   that this is a rarely-touched setting rather than part of the script. */
+.config-field-trailing select {
+  padding: 0 var(--space-2);
+}
+
+/* Tag Change's two array attributes (R4, 1.16.0). One tag path per line: a
+   comma-separated box invites a comma inside a tag path, which is legal. */
+.config-paths {
+  min-width: 22rem;
+  padding: var(--space-1, 4px) var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.config-paths:focus-visible {
+  border-color: var(--accent-primary);
+}
+
+.config-changetypes {
+  display: inline-flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.config-changetypes label {
+  display: inline-flex;
+  gap: var(--space-1, 4px);
+  align-items: center;
+  white-space: nowrap;
+}

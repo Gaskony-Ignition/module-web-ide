@@ -1,0 +1,123 @@
+/*
+ * The overview ruler, right of the code.
+ *
+ * A fixed-width column in the editor's flex row rather than an overlay: an
+ * absolutely positioned strip lands on top of CodeMirror's own scrollbar, and
+ * the two then fight for the same 14px whenever a document is long enough to
+ * scroll — which is exactly when a ruler is worth having.
+ */
+.problem-ruler {
+  position: relative;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 100%;
+  border-left: var(--rule-width) solid var(--border-light);
+  /* The marks are absolutely positioned by percentage, so this must not scroll
+     with the content — it represents the WHOLE document, not the viewport. */
+  overflow: visible;
+}
+
+.problem-ruler-slot {
+  position: absolute;
+  right: 0;
+  left: 0;
+  /* `top` is set per mark, as a percentage of the document. Pulled up by half a
+     mark so the mark is CENTRED on its line's position rather than hanging
+     below it — at the top of a file the difference is the whole mark. */
+  margin-top: -2px;
+}
+
+.problem-ruler-mark {
+  display: block;
+  width: 100%;
+  height: 4px;
+  padding: 0;
+  border: none;
+  border-radius: 1px;
+  cursor: pointer;
+}
+
+/* Severity by colour AND by width: a 4px mark in a 14px column reads as
+   "something here" at a glance, and an error fills the column while a hint sits
+   inset, so the two are still distinguishable without relying on colour. */
+.problem-ruler-mark.is-error {
+  background: var(--error);
+}
+
+.problem-ruler-mark.is-warning {
+  background: var(--warning);
+}
+
+.problem-ruler-mark.is-info,
+.problem-ruler-mark.is-hint {
+  width: 60%;
+  margin-left: 20%;
+  background: var(--text-muted);
+}
+
+.problem-ruler-mark:hover,
+.problem-ruler-mark:focus-visible {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: 1px;
+}
+
+/* The hover card. Hidden by default and shown for the SLOT, so the pointer can
+   move from the mark onto the card without crossing a gap — otherwise the copy
+   button inside it can never be clicked. */
+.problem-ruler-card {
+  position: absolute;
+  top: 0;
+  right: calc(100% + var(--space-2));
+  z-index: 12;
+  display: none;
+  width: max-content;
+  max-width: 460px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--glass-panel);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.problem-ruler-slot:hover .problem-ruler-card,
+.problem-ruler-slot:focus-within .problem-ruler-card {
+  display: block;
+}
+
+.problem-ruler-where {
+  margin-bottom: var(--space-1);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* A parser message is a full sentence and wraps. Truncating it would lose the
+   part that says what to do, which is the part worth copying. */
+.problem-ruler-message {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.problem-ruler-copy {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.problem-ruler-copy:hover {
+  border-color: var(--accent-primary);
+}

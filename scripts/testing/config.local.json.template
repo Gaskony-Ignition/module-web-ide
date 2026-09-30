@@ -1,0 +1,20 @@
+{
+  "_comment": "COPY TO config.local.json AND FILL IN. That file is gitignored because it holds a gateway password - never commit it, and never paste its contents into a chat or a prompt.",
+  "gateway_url": "http://<gateway-host>:8088",
+  "gateway_url_alt": "http://localhost:8088",
+  "container_name": "ignition-module-testing",
+  "username": "<gateway-admin-username>",
+  "password": "<gateway-admin-password>",
+  "module_id": "com.gaskony.scriptide",
+  "module_folder": "/absolute/path/to/ignition-module-web-ide/build",
+  "spa_path": "/data/scriptide/",
+  "spa_path_candidates": [
+    "/data/scriptide/",
+    "/data/scriptide",
+    "/res/scriptide/"
+  ],
+  "socket_path": "/system/scriptide",
+  "_credentials": "A gateway user with the Administrator role - script execution and resource writes are Admin-gated, so a lesser account fails those checks with a 403 that reads like a module bug.",
+  "_spa": "The trailing slash is load-bearing: a bare /data/scriptide returns 404. That is platform dispatcher behaviour, not a module bug.",
+  "_socket": "The LSP/exec WebSocket. NOT under /data - WebResourceManager servlets live at /system/<path>. Spike S1 could not verify this resolves for a new alias without a built module, so the deploy gate checks it every time."
+}

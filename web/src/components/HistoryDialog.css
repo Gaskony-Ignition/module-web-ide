@@ -1,0 +1,177 @@
+/* Local history (1.15.0).
+
+   Deliberately shaped like ConflictDialog — same backdrop, same frosted panel,
+   same radius — because they are the same kind of moment: a decision about a
+   version of a file, taken over the top of the editor. A second dialog idiom
+   would make the app look like two apps. The border is the neutral one rather
+   than the conflict warning, because opening your own history is not a fault
+   condition. */
+
+.history-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+  z-index: 20;
+}
+
+.history-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(1000px, 100%);
+  height: min(640px, 100%);
+  min-height: 0;
+  padding: var(--space-5);
+  background: var(--glass-panel);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+}
+
+.history-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.history-head h2 {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+.history-close {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: var(--font-size-code);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 var(--space-1, 4px);
+}
+
+.history-close:hover {
+  color: var(--text-primary);
+}
+
+/* The list is fixed-width and the preview takes the rest. `min-height: 0` on
+   both, or a flex child refuses to shrink below its content and the panel grows
+   past the window instead of scrolling inside it. */
+.history-body {
+  display: flex;
+  gap: var(--space-3);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.history-list {
+  flex: 0 0 260px;
+  min-height: 0;
+  overflow-y: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+}
+
+.history-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.history-version {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 2px);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.history-version:hover {
+  background: var(--bg-tertiary);
+}
+
+.history-version.is-selected {
+  background: var(--accent-primary-bg);
+  box-shadow: inset 2px 0 0 var(--accent-primary);
+}
+
+.history-when {
+  font-variant-numeric: tabular-nums;
+}
+
+.history-meta {
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+}
+
+.history-preview {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.history-same {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+}
+
+.history-source {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-3);
+  overflow: auto;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.history-empty {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: var(--font-size-base);
+}
+
+.history-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.history-note {
+  margin: 0;
+  font-size: var(--font-size-base);
+  max-width: 52ch;
+}
+
+.history-actions {
+  display: flex;
+  gap: var(--space-2);
+}

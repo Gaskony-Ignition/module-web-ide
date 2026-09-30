@@ -1,0 +1,55 @@
+/*
+ * The right-click menu.
+ *
+ * Fixed, not absolute: the coordinates come from a pointer event, which are
+ * viewport coordinates, and the tree it opens over is inside two scroll
+ * containers. An absolutely-positioned menu would land somewhere else entirely
+ * the moment the tree was scrolled.
+ */
+.context-menu {
+  position: fixed;
+  z-index: 60;
+  min-width: 180px;
+  padding: var(--space-1) 0;
+  background: var(--bg-secondary);
+  border: var(--rule-width) solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-popup);
+}
+
+.context-menu-heading {
+  padding: var(--space-1) var(--space-3) var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-mono);
+  /* One line only: a resource path is long, and a heading that wraps to three
+     lines pushes the items themselves off the bottom of a short window. */
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-bottom: var(--rule-width) solid var(--border-light);
+  margin-bottom: var(--space-1);
+}
+
+.context-menu-item {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.context-menu-item:hover:not(:disabled) {
+  background: var(--accent-primary-bg);
+}
+
+.context-menu-item:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}

@@ -1,0 +1,56 @@
+.activity-bar {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 var(--activity-bar-width);
+  width: var(--activity-bar-width);
+  /* Its own surface, not the rail's. On a flat theme (no shadow, square
+     corners) the pack has nothing but a step to separate its furniture with, so
+     --bg-chrome moves well off the page; on a rounded, shadowed one it is flush
+     with the rail and the border does the work. */
+  background: var(--bg-chrome);
+  border-right: var(--rule-width) solid var(--border-light);
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--activity-bar-width);
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  /* The RAIL's ink, not the page's. Identical to --text-muted on eight of the
+     ten themes; on `finance-ledger` and `leather-parchment-tan` the rail is the
+     inverse of the page and the shared token would be unreadable on it. */
+  color: var(--text-chrome);
+  cursor: pointer;
+  /* The active marker is a left border drawn in the transparent state too, so
+     activating an item does not shift its icon when it lights up. Its WIDTH is
+     the theme's: 2px on `newsprint-night`, 4px on both `industrial` packs. */
+  border-left: var(--marker-width) solid transparent;
+}
+
+.activity-item:hover {
+  color: var(--text-chrome-active);
+  background: none;
+}
+
+.activity-item.is-active {
+  color: var(--text-chrome-active);
+  border-left-color: var(--accent-chrome);
+  background: none;
+}
+
+.activity-item:focus-visible {
+  outline: 1px solid var(--accent-chrome);
+  outline-offset: -2px;
+}
+
+/* Pushes the panel toggles to the bottom of the strip, the way VS Code puts
+   accounts and settings there — it is what tells the eye the lower pair do a
+   different job from the upper pair. */
+.activity-spacer {
+  flex: 1 1 auto;
+}

@@ -1,0 +1,429 @@
+/* The Script Console. Editor and output scroll independently, in either
+   orientation — rows (editor above) or columns (editor beside). */
+
+.console {
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* so the children can actually shrink inside a flex parent */
+  min-width: 0;
+  height: 100%;
+  /* The lit ground, the same three declarations `.app`, `.panel` and
+     `.code-editor` carry. It used to be a bare opaque `--bg-primary`, which on
+     the two glass packs painted out --page-glow over the whole console — so the
+     popped-out console, where the console IS the tab, showed the theme's teal
+     only in the strip of `.app` left visible around it and flat #1a1233 (the
+     base both aurora packs share) everywhere else. Nigel, 07/09/2026: "a tiny
+     bit on the top left looks teal but the rest looks violet". `fixed` is what
+     makes the glow line up with the window rather than with this box, so the
+     docked console and the popped-out one light the same way. */
+  background-color: var(--bg-primary);
+  background-image: var(--page-glow);
+  background-attachment: fixed;
+}
+
+/*
+ * Editor + divider + output. The ONE box the split is measured against, which
+ * is why it exists: the share must not be computed over the toolbar, and it
+ * must not include the "requires Administrator" notice, because neither is
+ * draggable and both change the answer when they appear.
+ */
+.console-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.console-rows .console-body {
+  flex-direction: column;
+}
+
+.console-columns .console-body {
+  flex-direction: row;
+}
+
+.console-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--rule-width) solid var(--border-light);
+  background: var(--bg-secondary);
+  flex: 0 0 auto;
+}
+
+.console-spacer {
+  flex: 1 1 auto;
+}
+
+/* The project picker — same shape as QueryBrowser's .qb-field, for its own
+   datasource select. */
+.console-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.console-field select {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+}
+
+.console-hint {
+  font-size: 12px;
+}
+
+.console-denied {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+/* Same shape as .console-denied, but the red QueryBrowser gives its own
+   .qb-fetch-error — a failed fetch is not a routine notice. */
+.console-fetch-error {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--error);
+  font-size: 12px;
+  flex: 0 0 auto;
+}
+
+/* The editor's share, overridden inline once the body has been measured. These
+   are the fallback and the first-frame value both — a console with no geometry
+   (no ResizeObserver, or a headless DOM) keeps exactly the split it had before
+   the divider existed. Zero minimums on BOTH axes, because the same rule has to
+   hold when the panes are side by side. */
+.console-editor {
+  flex: 1 1 45%;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Same reasoning as .code-editor-host in CodeEditor.css: CodeMirror draws no
+   outline of its own, so the pane that hosts it needs one for keyboard
+   users. */
+.console-editor:focus-within {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+.console-output {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--bg-secondary);
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.console-empty {
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+.console-block {
+  margin: 0 0 var(--space-2);
+  border-left: 2px solid transparent;
+  padding-left: var(--space-2);
+}
+
+.console-block pre {
+  margin: 0;
+  /* Output is preformatted but must not force the pane to scroll sideways for
+     one long line — wrap it and keep the whitespace. */
+  white-space: pre-wrap;
+  word-break: break-word;
+  font: inherit;
+}
+
+.console-stdout {
+  color: var(--text-primary);
+}
+
+.console-stderr {
+  color: var(--warning);
+  border-left-color: var(--warning);
+}
+
+.console-note {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.console-error {
+  color: var(--error);
+  border-left-color: var(--error);
+}
+
+.console-frames {
+  list-style: none;
+  margin: var(--space-1) 0 0;
+  padding: 0 0 0 var(--space-3);
+}
+
+.console-frames li {
+  margin: 0;
+}
+
+.console-frame,
+.console-frame-link {
+  font: inherit;
+  color: var(--text-secondary);
+}
+
+.console-frame-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent-primary);
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.console-frame-link:hover,
+.console-frame-link:focus-visible {
+  color: var(--text-primary);
+}
+
+.console-traceback {
+  margin: var(--space-1) 0 0;
+  white-space: pre-wrap;
+  color: var(--text-secondary);
+}
+
+/* ---- output as a defined panel (v1.2.0) ---------------------------------
+ *
+ * The output used to be a bare scrolling region directly under the editor, and
+ * it read as more editor — there was no line telling you where your script
+ * ended and its result began. It is now a titled panel with its own header,
+ * rule and inset background, which is the same treatment VS Code gives its
+ * Output and Terminal views.
+ */
+
+/* Always the LEFTOVER pane: the editor is the one carrying a fixed basis, so
+   the output takes whatever the divider leaves and never fights it for a
+   pixel. */
+.console-output-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  background: var(--bg-secondary);
+}
+
+/* The rule between the panes belongs on the side the divider is on, and the
+   divider supplies its own 1px line — so this is the pane's own edge, drawn
+   only where there is no divider to draw it. Rows get a top rule, columns a
+   left one; carrying the rows rule into columns put a horizontal line above a
+   pane that has nothing above it. */
+.console-rows .console-output-panel {
+  border-top: var(--rule-width) solid var(--border-light);
+}
+
+.console-columns .console-output-panel {
+  border-left: var(--rule-width) solid var(--border-light);
+}
+
+.console-output-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+  padding: var(--space-1) var(--space-3);
+  border-bottom: var(--rule-width) solid var(--border-light);
+  background: var(--bg-tertiary);
+}
+
+.console-output-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.console-output-count {
+  font-size: 11px;
+}
+
+.console-running {
+  font-size: 11px;
+  color: var(--accent-primary);
+}
+
+/* Overrides the flex share declared earlier — the panel owns it now. */
+.console-output {
+  flex: 1 1 auto;
+  border-top: none;
+  background: transparent;
+}
+
+/* Each block gets a rule between runs, so consecutive runs are visibly separate
+   rather than one continuous stream. */
+.console-block + .console-block {
+  border-top: 1px dashed var(--border-light);
+  padding-top: var(--space-2);
+}
+
+/* ---- run dividers and the syntax-error caret (v1.5.0) -------------------
+ *
+ * Output used to accumulate as one undifferentiated column: three runs in a row
+ * and you could not tell where the second one started. Each run now opens with
+ * a `▸ run 3 · 12:01:45` note and closes with a dim one-line verdict, both of
+ * them ordinary notes so they stay quiet — the loudest thing in the pane must
+ * still be the script's own output.
+ */
+
+/* `.console-block pre` is (0,1,1) and sets pre-wrap, so this has to name both
+   or the caret line wraps and stops pointing at anything. */
+.console-block pre.console-caret {
+  margin: var(--space-1) 0 0;
+  /* The caret line is positional: wrapping it would move the ^ away from the
+     character it points at, so this one pre does NOT wrap. */
+  white-space: pre;
+  overflow-x: auto;
+  color: var(--text-secondary);
+  font: inherit;
+}
+
+/* A frame line reads as a traceback, so it is monospaced and quiet even as a
+   link — the same weight as the text around it, distinguished by colour. */
+.console-frames li {
+  font-family: var(--font-mono);
+}
+
+/*
+ * The rows/columns toggle.
+ *
+ * A segmented pair rather than one button that flips, because a single toggle
+ * has to show either the state or the action and is read as the other one half
+ * the time. Two buttons with `aria-pressed` say both at once: which layout is
+ * on, and what the other one would be.
+ */
+.console-layout-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  border: var(--rule-width) solid var(--border-light);
+  border-radius: var(--radius-row);
+  overflow: hidden;
+}
+
+.console-layout-toggle button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height);
+  height: var(--control-height);
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.console-layout-toggle button + button {
+  border-left: var(--rule-width) solid var(--border-light);
+}
+
+.console-layout-toggle button:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.console-layout-toggle button.is-active {
+  background: var(--accent-primary-bg);
+  color: var(--text-primary);
+}
+
+/* A run of output that carried its own colour. The span exists only when an
+   escape was found, so unstyled output is still one text node in the <pre>. */
+.console-ansi {
+  /* Nothing of its own: every property it needs is set inline from the escape,
+     and anything set here would fight a script that asked for the opposite. The
+     class is here so a suite can select these and a theme can reach them. */
+  white-space: inherit;
+}
+
+/* The arrival time, when the Times toggle is on. Sits beside the block rather
+   than inside its <pre>, so selecting the output copies the output. */
+.console-stamp {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-chrome);
+  user-select: none;
+}
+
+/* A pressed toolbar toggle. The console's buttons are otherwise all momentary,
+   so "on" needs to look different from "hovered" or it reads as neither. */
+.console-toolbar button.is-on {
+  background: var(--accent-primary-bg);
+  color: var(--accent-primary);
+}
+
+/* ---- a run as a foldable block -------------------------------------------
+ *
+ * The run's opening line is its fold control: a real button, so it takes Tab,
+ * Enter and Space, and it still reads as the quiet note it replaced. */
+.console-run {
+  margin: 0 0 var(--space-2);
+}
+
+.console-run + .console-run,
+.console-run + .console-block,
+.console-block + .console-run {
+  border-top: 1px dashed var(--border-light);
+  padding-top: var(--space-2);
+}
+
+.console-run-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  margin: 0 0 var(--space-1);
+  padding: 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-style: italic;
+  color: var(--text-muted);
+  text-align: left;
+  cursor: pointer;
+}
+
+.console-run-toggle:hover {
+  color: var(--text-primary);
+}
+
+.console-run-chevron {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.console-run-folded {
+  font-style: normal;
+}

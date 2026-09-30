@@ -1,0 +1,35 @@
+.wdc-dialog {
+  width: min(520px, 100%);
+  gap: var(--space-2);
+}
+
+.wdc-row {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.wdc-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.wdc-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+}
+
+/* Sits directly under the checkbox that causes it, so the consequence is next
+   to the control rather than in a summary nobody reads. */
+.wdc-warn {
+  margin: 0 0 var(--space-1) 24px;
+  color: var(--warning);
+  font-size: 12px;
+}
+
+.wdc-status {
+  font-size: 12px;
+}

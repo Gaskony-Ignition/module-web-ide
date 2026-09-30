@@ -1,0 +1,143 @@
+/* The Ctrl+P palette. Anchored near the top, where every editor puts it. */
+
+.quick-open-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  /* Not centred vertically: the palette is a continuation of the toolbar, and a
+     list that grows downwards from a fixed top edge does not move the row under
+     the pointer as results arrive. */
+  padding-top: 8vh;
+  /* Deliberately no dimming layer. This dismisses on any outside click, so it
+     needs a hit area, not a scrim — a palette is not a modal, and darkening the
+     code behind it makes a 200ms interaction feel like a mode change. */
+  background: transparent;
+  z-index: 30;
+}
+
+.quick-open {
+  display: flex;
+  flex-direction: column;
+  width: min(620px, calc(100% - var(--space-5) * 2));
+  max-height: 60vh;
+  background: var(--glass-panel);
+  /* Frosted, and only here: a layer that floats OVER code. Never behind
+     the editor — blurring the ground under syntax highlighting is how a
+     theme becomes unreadable. `none` on the seven non-glass packs. */
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  /* The heavier line, not the hairline: four of the ten themes cast no shadow
+     at all, and on those this border is the only thing that says the palette is
+     OVER the code rather than in it. */
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-panel);
+  /* The theme's own elevation, in its own shadow language — `none` on the flat
+     packs, a wide soft drop on the aurora pair. Was a hardcoded 8px/24px, which
+     is why `industrial-day-cyan` had a Perspective-flat session beside an IDE
+     that floated its palette. */
+  box-shadow: var(--shadow-popup);
+  overflow: hidden;
+}
+
+.quick-open-input {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-muted);
+}
+
+.quick-open-input input {
+  flex: 1 1 auto;
+  /* Zero minimum, or a long placeholder sets the palette's width. */
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+
+/* No local override: unlike the search box, this input had no focus
+   indicator at all — the global ring in index.css now provides one. */
+
+.quick-open-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-1) 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.quick-open-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-height: var(--row-height);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-row);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+.quick-open-row svg {
+  /* Baseline alignment puts an icon a pixel high; nudge rather than switch the
+     row to centre, which would unalign the two text columns. */
+  align-self: center;
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+
+.quick-open-row.is-selected {
+  background: var(--accent-primary-bg);
+}
+
+/* --text-muted (below) is tuned against the plain row, not this wash — on it,
+   the kind/detail columns fall to 3:1, and --text-secondary measures the same
+   as --text-muted on this theme (Nord — Dark Frost), so it is not a step up
+   here. --text-primary is the next token that actually differs. */
+.quick-open-row.is-selected .quick-open-kind,
+.quick-open-row.is-selected .quick-open-detail {
+  color: var(--text-primary);
+}
+
+.quick-open-name {
+  flex: 0 0 auto;
+  font-weight: 500;
+}
+
+.quick-open-kind {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* The path is the least important column and the only one that can be long, so
+   it takes the remaining width and truncates from the LEFT: the tail of a
+   resource path is what identifies it, the `ignition/script-python/` head is
+   the same on every row. */
+.quick-open-detail {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: rtl;
+}
+
+.quick-open-empty {
+  padding: var(--space-2) var(--space-3);
+  font-size: 12px;
+}
