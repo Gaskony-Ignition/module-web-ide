@@ -1,0 +1,134 @@
+.outline {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  width: 220px;
+  flex: 0 0 220px;
+  border-left: var(--rule-width) solid var(--border-light);
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.outline-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--rule-width) solid var(--border-light);
+}
+
+.outline-title {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.outline-count {
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.outline-filter {
+  margin: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+.outline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--space-3);
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.outline-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: var(--row-height);
+  padding: 0 var(--space-2);
+  background: none;
+  border: none;
+  border-radius: var(--radius-row);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-align: left;
+}
+
+.outline-item:hover,
+.outline-item:focus-visible {
+  background: var(--bg-tertiary);
+}
+
+.outline-kind {
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.outline-kind-class {
+  color: var(--syntax-type);
+}
+
+.outline-kind-def,
+.outline-kind-method {
+  color: var(--syntax-function);
+}
+
+.outline-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.outline-line {
+  flex: 0 0 auto;
+  font-size: 11px;
+}
+
+.outline-empty,
+.outline-stale {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: 12px;
+}
+
+/* The panel's width is set inline by the splitter, so the fixed values above are
+   only a starting point — this stops the flex basis from fighting it. */
+.outline {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.outline-spacer {
+  flex: 1 1 auto;
+}
+
+.outline-close {
+  padding: 0 2px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.outline-close:hover {
+  color: var(--text-primary);
+  background: none;
+}

@@ -1,0 +1,54 @@
+{
+  "_comment": "The wire contract between TracebackFormatter.java and execClient.ts, which nothing else checks — TypeScript cannot type a socket, and on 1.4.3 the two sides had disagreed on every field name for four releases without a single failure. `zeroDivision` and `syntaxError` are COPIED VERBATIM from TracebackFormatterTest, which asserts these exact strings against real Jython 2.7.4 output; if the server changes, that test fails first and this file is re-copied from it, never edited to match. `libraryFrame` is hand-built, because a unit test has no project library to raise from — but its `<module:util.helpers>` spelling is the one MEASURED on a real gateway in spike S1, and it is the only shape that makes a frame clickable.",
+  "zeroDivision": {
+    "type": "ZeroDivisionError",
+    "rendered": "Traceback (most recent call last):\n  File \"<console>\", line 3, in <module>\n  File \"<console>\", line 2, in f\nZeroDivisionError: integer division or modulo by zero\n",
+    "message": "integer division or modulo by zero",
+    "frames": [
+      {
+        "file": "<script-ide:Demo:console>",
+        "function": "<module>",
+        "line": 3,
+        "isSubmitted": true,
+        "libraryModule": null
+      },
+      {
+        "file": "<script-ide:Demo:console>",
+        "function": "f",
+        "line": 2,
+        "isSubmitted": true,
+        "libraryModule": null
+      }
+    ]
+  },
+  "syntaxError": {
+    "type": "SyntaxError",
+    "rendered": "SyntaxError: (\"mismatched input '\\\\n' expecting COLON\", ('<console>', 1, 7, 'if True\\n'))\n",
+    "message": "mismatched input '\\n' expecting COLON",
+    "line": 1,
+    "offset": 7,
+    "text": "if True\n",
+    "frames": []
+  },
+  "libraryFrame": {
+    "type": "AttributeError",
+    "rendered": "Traceback (most recent call last):\n  File \"<console>\", line 2, in <module>\n  File \"<module:util.helpers>\", line 11, in load\nAttributeError: 'NoneType' object has no attribute 'get'\n",
+    "message": "'NoneType' object has no attribute 'get'",
+    "frames": [
+      {
+        "file": "<script-ide:Demo:console>",
+        "function": "<module>",
+        "line": 2,
+        "isSubmitted": true,
+        "libraryModule": null
+      },
+      {
+        "file": "<module:util.helpers>",
+        "function": "load",
+        "line": 11,
+        "isSubmitted": false,
+        "libraryModule": "util.helpers"
+      }
+    ]
+  }
+}

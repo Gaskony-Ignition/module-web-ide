@@ -1,0 +1,53 @@
+/* A 1px visual divider with a 5px grab area straddling it — a true 1px target
+   is unhittable, and padding it out on both sides keeps the layout honest. */
+.resizer {
+  flex: 0 0 1px;
+  width: 1px;
+  position: relative;
+  background: var(--border-light);
+  cursor: col-resize;
+  /* Never let a fast drag select the text either side of the divider. */
+  touch-action: none;
+  user-select: none;
+  /* ABOVE the panes either side, and the reason is measured (04/09/2026):
+     without it the divider between two editors received no pointer event at
+     all. `elementFromPoint` on its own centre returned the neighbouring
+     CodeMirror's line-number gutter — a 1px divider between two flex children
+     loses the half-pixel to whichever paints last, and the drag simply did
+     nothing while every static check said the divider was there. */
+  z-index: 2;
+}
+
+/* The GRAB area, three pixels either side of a one-pixel line. A divider you
+   have to hit exactly is a divider people conclude does not move. */
+.resizer::after {
+  content: '';
+  position: absolute;
+  inset: 0 -3px;
+}
+
+.resizer:hover,
+.resizer:focus-visible {
+  background: var(--accent-primary);
+}
+
+/* The element itself is 1px wide, so an inset ring (the global default) has
+   nowhere to sit — draw it outward instead, the same as any other custom
+   control with no native focus indicator (e.g. a slider handle). */
+.resizer:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 1px;
+}
+
+/* The horizontal form, for the bottom panel. Same 1px rule and same padded grab
+   area, rotated — the panel is sized from the edge above it. */
+.resizer.resizer-horizontal {
+  flex: 0 0 1px;
+  width: auto;
+  height: 1px;
+  cursor: row-resize;
+}
+
+.resizer.resizer-horizontal::after {
+  inset: -3px 0;
+}

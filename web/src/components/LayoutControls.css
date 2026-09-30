@@ -1,0 +1,84 @@
+.layout-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.layout-button {
+  padding: 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  line-height: 0;
+}
+
+.layout-button:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* Pressed is a colour change, not a box: the glyph already carries the state in
+   its filled edge, and a second indicator on top of it reads as two settings. */
+.layout-button[aria-pressed='true'] {
+  color: var(--text-primary);
+}
+
+.layout-button[aria-pressed='false'] {
+  opacity: 0.55;
+}
+
+.layout-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 40;
+  min-width: 210px;
+  padding: var(--space-1) 0;
+  background: var(--glass-panel);
+  /* Frosted, and only here: a layer that floats OVER code. Never behind
+     the editor — blurring the ground under syntax highlighting is how a
+     theme becomes unreadable. `none` on the seven non-glass packs. */
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+}
+
+.layout-menu-title {
+  margin: 0;
+  padding: var(--space-1) var(--space-3) var(--space-1) 30px;
+}
+
+.layout-menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 3px var(--space-3) 3px var(--space-1);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-row);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  text-align: left;
+}
+
+.layout-menu-item:hover {
+  background: var(--accent-primary-bg);
+}
+
+.layout-menu-tick {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  flex: 0 0 22px;
+  color: var(--accent-primary);
+}
+
+.layout-menu-rule {
+  height: 1px;
+  margin: var(--space-1) 0;
+  background: var(--border-light);
+}

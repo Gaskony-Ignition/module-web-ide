@@ -1,0 +1,127 @@
+/* Compare an override with what it overrides (1.16.0).
+
+   Shaped like ConflictDialog and HistoryDialog — same backdrop, same frosted
+   panel — because it is the same kind of moment: a decision about a version of a
+   file, taken over the editor. Its own classes, never theirs: a shared class is
+   a shared claim, and the live suites count on those. */
+
+.parentdiff-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+  z-index: 20;
+}
+
+.parentdiff-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(1000px, 100%);
+  height: min(640px, 100%);
+  min-height: 0;
+  padding: var(--space-5);
+  background: var(--glass-panel);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+}
+
+.parentdiff-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.parentdiff-head h2 {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+.parentdiff-close {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: var(--font-size-code);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 var(--space-1, 4px);
+}
+
+.parentdiff-close:hover {
+  color: var(--text-primary);
+}
+
+.parentdiff-status {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+.parentdiff-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  padding: var(--space-2) 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+.parentdiff-row {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  white-space: pre;
+}
+
+/* Three signals per changed row — a glyph, a fill and a solid left edge —
+   because colour alone fails a colour-blind reader and fails on a projector. */
+.parentdiff-row.is-added {
+  background: color-mix(in srgb, var(--success) 14%, transparent);
+  box-shadow: inset 2px 0 0 var(--success);
+}
+
+.parentdiff-row.is-removed {
+  background: color-mix(in srgb, var(--error) 14%, transparent);
+  box-shadow: inset 2px 0 0 var(--error);
+}
+
+.parentdiff-mark {
+  flex: 0 0 auto;
+  width: 1ch;
+  color: var(--text-muted);
+}
+
+.parentdiff-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.parentdiff-empty {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: var(--font-size-base);
+}
+
+.parentdiff-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.parentdiff-note {
+  margin: 0;
+  font-size: var(--font-size-base);
+}

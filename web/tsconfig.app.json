@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    // App.tsx reads the module version straight out of package.json — the file
+    // Gradle's syncVersion keeps authoritative. Without this the import is an error.
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "types": ["node", "vitest/globals", "@testing-library/jest-dom"],
+    "tsBuildInfoFile": "./build/tsconfig.app.tsbuildinfo"
+  },
+  "include": ["src"]
+}

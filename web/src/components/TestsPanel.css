@@ -1,0 +1,341 @@
+/*
+ * The Tests panel, in the bottom panel next to the console and Problems.
+ *
+ * Every class is its own. Nothing borrows `.problems-row` or `.console-*`: the
+ * live suites count rows by those class names, and widening what one matches
+ * silently changes what a suite asserts.
+ */
+
+.tests-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  /* Zero minimum, or the list pushes the panel past its own height instead of
+     scrolling inside it. */
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tests-panel-bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.tests-panel-count {
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.tests-panel-tally {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+.tests-tally-pass {
+  color: var(--success);
+}
+
+.tests-tally-fail {
+  color: var(--error);
+}
+
+.tests-tally-error {
+  color: var(--warning);
+}
+
+.tests-tally-skip {
+  color: var(--text-muted);
+}
+
+.tests-panel-elapsed {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.tests-panel-run {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  margin-left: auto;
+}
+
+.tests-panel-rerun {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+}
+
+.tests-panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--space-2) 0;
+  overflow-y: auto;
+}
+
+.tests-panel-empty,
+.tests-panel-note,
+.tests-panel-error {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-prose);
+}
+
+.tests-panel-empty,
+.tests-panel-note {
+  color: var(--text-muted);
+}
+
+.tests-panel-note {
+  border-top: 1px solid var(--border-light);
+}
+
+.tests-panel-error {
+  color: var(--error);
+}
+
+.tests-module-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--row-height);
+  padding: 0 var(--space-3);
+}
+
+.tests-module-name {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.tests-module-tag {
+  padding: 0 var(--space-1);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.tests-module-run,
+.tests-row-toggle {
+  padding: 0 var(--space-2);
+  background: transparent;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+}
+
+.tests-module-run {
+  margin-left: auto;
+}
+
+.tests-module-run:hover:not(:disabled),
+.tests-row-toggle:hover {
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.tests-module-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tests-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--row-height);
+  padding: 0 var(--space-3) 0 var(--space-4);
+}
+
+.tests-row:hover {
+  background: var(--bg-tertiary);
+}
+
+.tests-row-mark {
+  flex: 0 0 auto;
+  width: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+.tests-row.is-pass .tests-row-mark {
+  color: var(--success);
+}
+
+.tests-row.is-fail .tests-row-mark {
+  color: var(--error);
+}
+
+.tests-row.is-error .tests-row-mark {
+  color: var(--warning);
+}
+
+.tests-row.is-skip .tests-row-mark {
+  color: var(--text-muted);
+}
+
+.tests-row-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-code);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tests-row-name:hover {
+  color: var(--accent-primary);
+}
+
+.tests-row-elapsed {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+/* A test the runner will skip, shown before it has run at all — the same small
+   pill as a module's setUp/tearDown tags, but on the test row rather than the
+   module header, so it gets its own class rather than widening theirs. */
+.tests-row-tag {
+  flex: 0 0 auto;
+  padding: 0 var(--space-1);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* How many parameterised cases a discovered test produced, shown on the parent
+   row in place of a single elapsed time — the row itself did not run, its
+   cases did. */
+.tests-row-cases {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.tests-row-run {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.tests-row-run:hover:not(:disabled) {
+  color: var(--accent-primary);
+}
+
+/* A parameterised test's individual cases, listed under its rolled-up parent
+   row. Indented one step further than a plain test row, and its own class:
+   a case is a different kind of thing from a discovered test — it is not
+   independently runnable — even though most of its layout matches. */
+.tests-case-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tests-case-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--row-height);
+  padding: 0 var(--space-3) 0 var(--space-6);
+}
+
+.tests-case-row:hover {
+  background: var(--bg-tertiary);
+}
+
+.tests-case-row.is-pass .tests-row-mark {
+  color: var(--success);
+}
+
+.tests-case-row.is-fail .tests-row-mark {
+  color: var(--error);
+}
+
+.tests-case-row.is-error .tests-row-mark {
+  color: var(--warning);
+}
+
+.tests-case-row.is-skip .tests-row-mark {
+  color: var(--text-muted);
+}
+
+.tests-case-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-code);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tests-row-detail {
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-5);
+  border-left: 2px solid var(--border-light);
+}
+
+.tests-row-message {
+  margin: 0 0 var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-prose);
+}
+
+.tests-row-caption {
+  margin: var(--space-2) 0 var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+/* Wide content scrolls inside its own box. A traceback is the one thing here
+   guaranteed to be wider than the panel, and letting it widen the panel makes
+   every other row scroll sideways too. */
+.tests-row-trace,
+.tests-row-output {
+  margin: 0;
+  padding: var(--space-2);
+  overflow-x: auto;
+  background: var(--bg-primary);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  white-space: pre;
+}
+
+.tests-row-trace {
+  color: var(--error);
+}

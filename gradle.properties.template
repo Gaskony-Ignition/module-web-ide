@@ -1,0 +1,34 @@
+# Gaskony Module Signing Configuration
+#
+# Copy this file to gradle.properties (gitignored — never commit it) and fill
+# in the five properties below with YOUR OWN keystore. The module owner's
+# keystore is local-only and cannot be shared; every contributor generates
+# their own self-signed one for their own dev/test gateway. See "Build" in
+# README.md.
+#
+# Quick version — from the repo root:
+#
+#   keytool -genkeypair -alias scriptide-dev -keyalg RSA -keysize 2048 \
+#     -validity 3650 -keystore scriptide-dev.jks \
+#     -dname "CN=Web IDE Dev, OU=Dev, O=Contributor, C=AU"
+#   keytool -exportcert -alias scriptide-dev -keystore scriptide-dev.jks \
+#     -rfc -file scriptide-dev.crt
+#
+# keytool will prompt interactively for a keystore password (->
+# ignition.signing.keystorePassword below) and then a key password (->
+# ignition.signing.certPassword) — press Enter at the second prompt to reuse
+# the keystore password, or set a different one; both work. You can also
+# pass -storepass/-keypass on the command line instead of the prompts, but
+# never paste real passwords into a chat/prompt/ticket.
+
+# Keystore configuration
+ignition.signing.keystoreFile=YOUR_KEYSTORE_PATH_HERE
+ignition.signing.keystorePassword=YOUR_PASSWORD_HERE
+
+# Certificate configuration
+ignition.signing.certAlias=YOUR_CERT_ALIAS_HERE
+ignition.signing.certPassword=YOUR_PASSWORD_HERE
+
+# Certificate file (self-signed, exported from keystore)
+# For self-signed modules, certFile can point to the public certificate
+ignition.signing.certFile=YOUR_CERT_FILE_PATH_HERE

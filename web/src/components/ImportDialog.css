@@ -1,0 +1,197 @@
+/* Choosing what to import out of a resource zip (1.20.0). Same panel treatment
+   as the other dialogs, its own classes — a shared class is a shared claim, and
+   these rows are selected by the live suite. */
+
+.import-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+  z-index: 20;
+}
+
+.import-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(680px, 100%);
+  /* A cap, not a height: ten scripts and a hundred should both open a dialog
+     that fits the window, with the LIST taking the scrolling rather than the
+     dialog — the footer has to stay reachable. */
+  max-height: min(78vh, 720px);
+  padding: var(--space-5);
+  background: var(--glass-panel);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+}
+
+.import-head {
+  flex: 0 0 auto;
+}
+
+.import-dialog h2 {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+.import-file {
+  margin: var(--space-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.import-source {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+/* The one growing thing: everything else in the dialog is fixed, so surplus
+   height goes here rather than being spread between the rows. */
+.import-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: var(--rule-width) solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+}
+
+.import-row,
+.import-result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  /* Cells have no horizontal padding of their own — see the table note in
+     CLAUDE.md. Set here so a name never touches the border. */
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--rule-width) solid var(--border-light);
+  cursor: pointer;
+}
+
+.import-row:last-child,
+.import-result:last-child {
+  border-bottom: none;
+}
+
+.import-row:hover {
+  background: var(--bg-secondary);
+}
+
+.import-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+}
+
+.import-badge {
+  flex: 0 0 auto;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.import-badge.is-replaces {
+  background: color-mix(in srgb, var(--warning) 22%, transparent);
+  color: var(--warning);
+}
+
+.import-badge.is-new {
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+}
+
+.import-empty {
+  margin: 0;
+  padding: var(--space-4) var(--space-3);
+}
+
+.import-rejected {
+  flex: 0 0 auto;
+  font-size: var(--font-size-base);
+}
+
+.import-rejected summary {
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.import-rejected ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.import-warning {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--warning);
+  font-size: var(--font-size-base);
+}
+
+.import-error {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--error);
+  font-size: var(--font-size-base);
+}
+
+.import-ok {
+  flex: 0 0 auto;
+  margin: 0;
+  color: var(--success);
+  font-size: var(--font-size-base);
+}
+
+.import-report {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+}
+
+.import-status {
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.import-result.is-failed .import-status,
+.import-result.is-missing .import-status {
+  color: var(--error);
+}
+
+.import-result.is-created .import-status,
+.import-result.is-replaced .import-status {
+  color: var(--success);
+}
+
+.import-detail {
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+}
+
+.import-actions {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

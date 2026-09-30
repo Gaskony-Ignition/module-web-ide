@@ -1,0 +1,88 @@
+[versions]
+ignition = "8.3.0"
+
+# Shipped via modlImplementation at latest stable rather than binding to the
+# gateway's bundled gson-2.8.9. Verified for this estate on 30/07/2026: the SDK
+# jars contain ZERO com/google/gson references (IA use a shaded fork), and the
+# default dataroutes ResponseRenderer is Object::toString, so no Gson type ever
+# crosses an SDK boundary. See gateway/build.gradle.kts for the full rationale.
+gson = "2.14.0"
+
+# JGit, for READING a project's git status. Core only — deliberately NOT
+# org.eclipse.jgit.ssh.apache, which the sibling git module ships: this module
+# never talks to a remote, so pulling in a transport stack would ship an SSH
+# client to serve a tree decoration. Same version as module-git so two modules
+# on one gateway cannot disagree about what "modified" means.
+#
+# Shipped rather than compileOnly because the Gateway bundles no JGit, and the
+# rig runs a STOCK image with no `git` binary at all — reading .git in pure Java
+# is the only route that does not require changing the image.
+jgit = "6.10.1.202505221210-r"
+
+# Matches the EE10 gateway runtime (jakarta.servlet-api 6.0.0 ships in
+# lib/core/gateway on 8.3.x).
+jakarta-servlet = "6.0.0"
+
+# Guava, for ONE thing: CommonContext.getEventBus() returns a Guava EventBus,
+# and Designer presence is delivered on it. compileOnly and pinned to what the
+# gateway actually bundles (lib/core/common/guava-32.0.1-jre.jar on 8.3.8) —
+# the platform's copy is what loads, so a newer declaration compiles and then
+# throws at runtime. Never modlImplementation: the EventBus instance is handed
+# to us by the platform, so it is a boundary type in the strictest sense.
+guava = "32.0.1-jre"
+
+# Jetty 12 WebSocket API for the LSP/exec socket. compileOnly ONLY — the gateway
+# provides Jetty at runtime, and a second Jetty on the module classpath breaks
+# GAN. 12.0.34 is what the live 8.3.8 test gateway runs.
+jetty = "12.0.34"
+
+# Jython. compileOnly ONLY, and this is a HARDER boundary than Jetty: two
+# interpreters on one classpath means two PySystemState registries, and
+# ScriptManager.interrupt() would consult a _current_frames() our running code
+# is not in — Stop would silently stop nothing. It also arrives transitively
+# from ignition-common; declaring it explicitly makes the boundary visible.
+#
+# Pinned at 2.7.3.5 (ignition-common 8.3.0's own transitive) even though the
+# 8.3.8 gateway ships jython-ia-2.7.4.0 — the estate rule is that a compileOnly
+# version must never EXCEED what the platform bundles. Every API this module
+# uses (ParserFacade, Py, PySystemState, PyException, PyTraceback, PyObject) is
+# stable across 2.7.x.
+jython = "2.7.3.5"
+
+junit-jupiter = "5.14.4"
+# Gradle 8.10.2 bundles a junit-platform-launcher too old for jupiter >= 5.12;
+# without this explicit pin, discovery fails with "OutputDirectoryCreator not
+# available". Keep in lockstep with junit-jupiter's platform line.
+junit-platform = "1.14.4"
+mockito = "5.23.0"
+assertj = "3.27.7"
+
+# BOUNDARY LIBRARY — compileOnly, pinned to the platform, never shipped.
+# SLF4J's whole job is to bind our log calls to the GATEWAY's logging backend;
+# shipping our own slf4j-api risks binding to nothing (a silent NOP logger) and
+# losing every log line. The gateway bundles two stacks: lib/core/common has
+# slf4j-api 2.0.12 + logback 1.3.14, lib/core/gateway has slf4j-api 1.7.36.
+# Pin to the LOWER MODERN one. Verified on the live 8.3.8 gateway 31/08/2026.
+# (Note web-designer sits at 2.0.18, which exceeds the platform and is a latent
+# violation of the estate rule in modules/CLAUDE.md — do not copy that.)
+slf4j = "2.0.12"
+
+[libraries]
+ignition-common = { module = "com.inductiveautomation.ignitionsdk:ignition-common", version.ref = "ignition" }
+ignition-gateway-api = { module = "com.inductiveautomation.ignitionsdk:gateway-api", version.ref = "ignition" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+jakarta-servlet = { module = "jakarta.servlet:jakarta.servlet-api", version.ref = "jakarta-servlet" }
+guava = { module = "com.google.guava:guava", version.ref = "guava" }
+jetty-ee10-websocket-server = { module = "org.eclipse.jetty.ee10.websocket:jetty-ee10-websocket-jetty-server", version.ref = "jetty" }
+jetty-websocket-api = { module = "org.eclipse.jetty.websocket:jetty-websocket-jetty-api", version.ref = "jetty" }
+jython = { module = "org.python:jython-ia", version.ref = "jython" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit-jupiter" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit-jupiter" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }

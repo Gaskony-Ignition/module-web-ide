@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SpotBugs exclusions for the Web IDE module.
+
+    Every entry here is a JUSTIFIED false positive, narrowed to one class and one
+    bug pattern. Nothing is suppressed because it was inconvenient: the two real
+    findings SpotBugs raised on this module's first full run (a dead `instanceof`
+    in PrivateStateRunner, and two fields in ExecutionService that were written
+    and never read) were FIXED in the code, not excluded.
+
+    Follow that rule. If a new finding appears, the first question is whether it
+    is right.
+-->
+<FindBugsFilter>
+
+    <!--
+        EI_EXPOSE_REP2 — handlers and services hold Gateway-owned singletons
+        (ProjectManager, ScriptManager) obtained from GatewayContext.
+
+        These are long-lived platform objects that are deliberately shared by
+        reference. A defensive copy is neither possible nor meaningful: a copied
+        ProjectManager would not be connected to the gateway, and a copied
+        ScriptManager would have its own PySystemState — which, in this module
+        specifically, would silently break script execution and the Stop button.
+        Sharing the reference IS the correct design here.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.ScriptResourceRouteHandler" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.WebDevConfigRouteHandler" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.ScriptAttributesRouteHandler" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.NamedQueryRouteHandler" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.NamedQueryTestRouteHandler" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.exec.PrivateStateRunner" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.lang.ProjectIndex" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.TransferRouteHandler" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.lang.SdkTagBrowser" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.lang.SdkDbSchema" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+    <!--
+        EI_EXPOSE_REP2 / MS_EXPOSE_REP on the presence registry — sharing the one
+        mutable registry by reference is the entire mechanism, not an oversight.
+
+        Every socket, the Designer event listener and the sweep all WRITE to the
+        same PresenceRegistry; that is how one person opening a file becomes a
+        badge in somebody else's tab strip. A defensive copy would give each
+        caller a private registry that nobody else can see, which does not
+        weaken the feature — it removes it.
+
+        Asked before excluded, per the rule at the top of this file. The other
+        two findings on these classes were FIXED rather than excluded: both
+        redundant null checks (on findSessions() and on ResourcePath.getPath(),
+        each declared non-null by the SDK) were deleted.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.presence.PresenceSweep" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+
+    <!--
+        EI_EXPOSE_REP2 on the git status sweep — the same mechanism, for the same
+        reason as the presence one above.
+
+        The sweep WRITES into the one GitStatusRegistry that the sockets read and
+        subscribe to. A defensive copy would give the sweep a private registry it
+        alone could see, so the poll would keep running and no tree would ever be
+        decorated: the feature would be gone, not protected.
+
+        The other finding on this package was FIXED rather than excluded —
+        GitSnapshot wrapped its marks map in an unmodifiable VIEW, which still
+        changes when the map behind it does. It copies now, which is what a
+        snapshot has to do to describe the moment it was taken.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.git.GitStatusSweep" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.presence.DesignerPresenceListener" />
+        <Bug pattern="EI_EXPOSE_REP2" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.ws.ScriptIdeSocketRegistry" />
+        <Bug pattern="MS_EXPOSE_REP" />
+    </Match>
+
+    <!--
+        EI_EXPOSE_REP / EI_EXPOSE_REP2 on Outcome.failure — the record carries the
+        Throwable the user's script threw, so that the traceback can be formatted
+        from it. A Throwable cannot be defensively copied, and cloning one would
+        destroy the cause chain and the PyTraceback that make a frame clickable.
+        Carrying the original is the entire purpose of the field.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.exec.PrivateStateRunner$Outcome" />
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
+    </Match>
+
+    <!--
+        HintIndex.Entry.params is already an immutable List (List.copyOf at every
+        construction site), so the "externally mutable" premise does not hold.
+        SpotBugs cannot see that through the List interface.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.lang.HintIndex$Entry" />
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2" />
+    </Match>
+
+    <!--
+        Gson data-transfer objects: fields are populated reflectively by
+        Gson.fromJson at the route boundary, which SpotBugs cannot see, so it
+        reports them as unwritten/unread. Standard false positive for a
+        deserialisation DTO.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.ScriptResourceRouteHandler$WriteRequest" />
+        <Bug pattern="NP_UNWRITTEN_FIELD,UWF_UNWRITTEN_FIELD,URF_UNREAD_FIELD" />
+    </Match>
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.ScriptAttributesRouteHandler$AttributeRequest" />
+        <Bug pattern="NP_UNWRITTEN_FIELD,UWF_UNWRITTEN_FIELD,URF_UNREAD_FIELD" />
+    </Match>
+
+    <!--
+        EQ_DOESNT_OVERRIDE_EQUALS on the import hook — inheriting PyObject.equals
+        is the CORRECT behaviour, not an oversight. It is Python's `==`, and this
+        object is a function: two references are equal when they are the same
+        function, which is what the base class already answers. The two fields it
+        adds (the delegate and the system state to restore) are identity, not
+        value — an equals that compared them would make two hooks for two
+        different runs compare equal, which is the only way this could ever
+        matter and is exactly backwards.
+
+        Asked before excluded, per the rule at the top of this file. The other two
+        findings on this class were FIXED: the `transient` on a field nothing
+        deserialises was removed, and a serialVersionUID declared.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.exec.PrivateStateRunner$RestoringImport" />
+        <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
+    </Match>
+
+    <!--
+        EQ_DOESNT_OVERRIDE_EQUALS on the routed stdout/stderr file — the same
+        reasoning as the import hook. It is a file object, equal only to itself,
+        which is what PyObject.equals already answers; the field it adds (the
+        platform's original file, kept to put back on shutdown) is identity, not
+        value.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.exec.RunOutputRouter$RoutedFile" />
+        <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS" />
+    </Match>
+
+    <!--
+        SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE in DbQueryRouteHandler.run — the
+        Query Browser's entire job is running SQL a human typed, verbatim, the
+        same way the Designer's own Database Query Browser and a console line of
+        system.db.runUpdateQuery(sql) do. There is no parameter to bind here: the
+        input IS the whole statement, by design, not a value being interpolated
+        into a query built by this code. The gate this finding usually protects
+        against — a value smuggled into structure — does not apply; what protects
+        this route instead is the same one the named-query test route and the
+        console use: Administrator only, CSRF-checked, ExecPolicy re-checked live,
+        and audited (hash, not source) before execution.
+    -->
+    <Match>
+        <Class name="com.gaskony.scriptide.gateway.routes.DbQueryRouteHandler" />
+        <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+    </Match>
+
+</FindBugsFilter>

@@ -1,0 +1,90 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background-color: var(--bg-primary);
+  background-image: var(--page-glow);
+  background-attachment: fixed;
+  border-top: var(--rule-width) solid var(--border-light);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--panel-tab-height);
+  flex: 0 0 var(--panel-tab-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+}
+
+.panel-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-4);
+  height: 100%;
+  overflow-x: auto;
+  /* The strip must never grow the panel's own scrollbar. */
+  scrollbar-width: none;
+}
+
+.panel-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* 11px uppercase, no box, a 1px underline on the active one. This is exactly
+   what distinguishes a panel tab from an editor tab in VS Code, and it is the
+   reason a panel does not read as a second row of files. */
+.panel-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.panel-tab:hover:not(:disabled) {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.panel-tab.is-active {
+  color: var(--text-primary);
+  border-bottom-color: var(--text-primary);
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+
+.panel-icon-button {
+  padding: 3px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  line-height: 0;
+}
+
+.panel-icon-button:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+/* One grower, zero minimum: the pane inside scrolls, the panel does not. */
+.panel-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}

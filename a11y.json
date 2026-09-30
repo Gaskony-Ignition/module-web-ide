@@ -1,0 +1,15 @@
+{
+  "gateway": "module-testing",
+  "web": [
+    "http://192.168.153.128:8088/data/scriptide/",
+    "http://192.168.153.128:8088/data/scriptide/?view=console&project=Template",
+    "http://192.168.153.128:8088/data/scriptide/?view=query&project=Template"
+  ],
+  "login": true,
+  "exceptions": [
+    {
+      "rule": "horizontal-scroll-320",
+      "reason": "A VS Code-shaped IDE: activity bar, tree, tab strip, editor and a dockable bottom panel (ui-design-guidelines.md §0: 1366x640 is the floor, not a ceiling). It does not claim to run on a 320px phone viewport, and the a11y-check.js reflow check has no per-repo exception hook (it is pushed unconditionally, outside excepted()) -- recorded here for the record, matching web-designer 0.107.1; a release still needs --skip-a11y-check to clear this one finding, noted in the release notes."
+    }
+  ]
+}

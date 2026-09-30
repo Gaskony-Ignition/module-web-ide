@@ -1,0 +1,108 @@
+/* Presence: who else has a file open.
+   Every colour, size and space here is a token — see modules/CLAUDE.md. */
+
+.presence-badge {
+  display: inline-flex;
+  align-items: center;
+  /* Overlapped, so three people cost less width than three separate chips. */
+  margin-left: var(--space-1);
+}
+
+.presence-badge .presence-dot + .presence-dot {
+  margin-left: -5px;
+}
+
+.presence-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  font-size: var(--font-size-xs);
+  font-family: var(--font-sans);
+  line-height: 1;
+  /* A ring in the page colour is what keeps overlapping dots separable; without
+     it two adjacent initials read as one smudge. */
+  border: 1px solid var(--bg-primary);
+  color: var(--accent-ink);
+  background: var(--text-secondary);
+}
+
+/* The two feeds are told apart by colour AND by the badge's title, never by
+   colour alone — see the estate rule about signals a colour-blind reader can
+   use. The Designer is the accent because it is the one you cannot see into. */
+.presence-dot.is-designer {
+  background: var(--accent-primary);
+}
+
+.presence-dot.is-ide {
+  background: var(--text-secondary);
+}
+
+.presence-dot.is-more {
+  background: transparent;
+  border-color: var(--border-light);
+  color: var(--text-secondary);
+  width: auto;
+  min-width: 16px;
+  padding: 0 3px;
+  border-radius: var(--radius);
+}
+
+/* ── The bar above the editor ───────────────────────────────────────────── */
+
+.presence-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+  min-height: var(--control-height);
+  padding: var(--space-1) var(--space-3);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-chrome);
+}
+
+.presence-bar-text {
+  min-width: 0;
+}
+
+.presence-bar-caveat {
+  margin-left: auto;
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+}
+
+/* ── The footer's project-wide list ─────────────────────────────────────── */
+
+.presence-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.presence-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+}
+
+.presence-who {
+  min-width: 0;
+}
+
+.presence-what {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: var(--font-size-xs);
+}
+
+.presence-empty {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}

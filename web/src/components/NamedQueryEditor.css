@@ -1,0 +1,367 @@
+/*
+ * The named-query editor: the tab row, and the panel under it.
+ *
+ * Every colour, font and space is a token from index.css. The tab row is built
+ * to the same --bar-height rhythm as `.config-strip`, which it replaces for a
+ * query document, so the code below it starts at the same place whichever kind
+ * of document is open.
+ */
+
+.nq-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-height: 0;
+  background: var(--bg-secondary);
+  border-bottom: var(--rule-width) solid var(--border-light);
+}
+
+.nq-tabs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  min-height: var(--bar-height);
+  padding: var(--space-1) var(--space-3);
+}
+
+.nq-tablist {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.nq-tab {
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.nq-tab:hover {
+  color: var(--text-primary);
+}
+
+.nq-tab.is-active {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  background: var(--bg-primary);
+}
+
+.nq-tab:focus-visible {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+/* Pushed to the right edge, where the settings strip's save button already
+   sits, so the same gesture is in the same place for both kinds of document. */
+.nq-save {
+  margin-left: auto;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  cursor: pointer;
+}
+
+.nq-save:disabled {
+  border-color: var(--border-light);
+  color: var(--text-muted);
+  background: none;
+  cursor: default;
+}
+
+/*
+ * The panel.
+ *
+ * A max-height rather than a fixed one: the Settings tab is much taller than
+ * the Authoring tab's parameter table, and a fixed height would either crop the
+ * one or leave the other mostly empty. It scrolls inside itself so the SQL
+ * buffer below keeps its own space.
+ */
+.nq-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: 48vh;
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border-top: var(--rule-width) solid var(--border-light);
+}
+
+/* With the SQL buffer hidden, this IS the editor area — see `is-full` in the
+   component. Empty space below a panel that could have used it is a defect. */
+.nq-editor.is-full {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.nq-editor.is-full .nq-panel {
+  flex: 1 1 auto;
+  max-height: none;
+}
+
+.nq-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nq-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.nq-field-wide {
+  flex: 1 1 260px;
+}
+
+.nq-field-wide input[type='text'] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Set the HEIGHT, not the padding — a select and an input with the same padding
+   come out different heights, which is the 1.4.2 finding. */
+.nq-field input[type='text'],
+.nq-field input[type='number'],
+.nq-field input[type='datetime-local'],
+.nq-field select,
+.nq-table input[type='text'],
+.nq-table select {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+}
+
+.nq-field input[type='number'] {
+  width: 96px;
+}
+
+.nq-field input:disabled,
+.nq-field select:disabled,
+.nq-table input:disabled,
+.nq-table select:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.nq-field em {
+  font-style: normal;
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.nq-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.nq-fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-light);
+  /* A framed GROUP, not a control: it takes the theme's panel radius, the same
+     as a dialog, so a rounded theme rounds its boxes and a square one does not
+     round anything at all. */
+  border-radius: var(--radius-panel);
+}
+
+.nq-fieldset legend {
+  padding: 0 var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.nq-security-row {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nq-fieldset .button,
+.nq-params-head .button,
+.nq-run {
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  cursor: pointer;
+}
+
+/* The legacy line sits where the settings strip's own text would, full width
+   under the tabs. The error colour: this query does not run. */
+.nq-legacy {
+  flex: 1 1 100%;
+  margin: 0;
+  padding: var(--space-1) var(--space-3) var(--space-2);
+  color: var(--error);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- parameter table and result grid ---- */
+
+.nq-params-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nq-params-head h3 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.nq-empty {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Wide content scrolls INSIDE its own box; the page never scrolls sideways.
+   There is no pager here and there will not be one — see the component. */
+.nq-scroll {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.nq-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.nq-table th,
+.nq-table td {
+  /* Cells carry no horizontal padding of their own; without this the columns
+     touch and a value reads as part of its neighbour. */
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.nq-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.nq-col-type {
+  margin-left: var(--space-2);
+  font-size: var(--font-size-xs);
+  text-transform: none;
+}
+
+.nq-table td {
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.nq-row-actions {
+  display: flex;
+  gap: var(--space-1);
+}
+
+.nq-row-actions button {
+  height: var(--control-height);
+  min-width: var(--control-height);
+  padding: 0 var(--space-1);
+  background: none;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.nq-row-actions button:disabled {
+  color: var(--text-muted);
+  cursor: default;
+}
+
+.nq-problem {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--error);
+  font-size: var(--font-size-xs);
+  white-space: normal;
+}
+
+/* ---- testing ---- */
+
+.nq-testing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.nq-test-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.nq-note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+.nq-note.is-error {
+  color: var(--error);
+}
+
+.nq-result {
+  min-height: 0;
+}
+
+.nq-value {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+}
+
+/* Screen-reader-only: a column of icon buttons still needs a header, and a
+   visible one would be a word for a column that holds no data. */
+.nq-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

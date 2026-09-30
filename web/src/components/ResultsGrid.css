@@ -1,0 +1,164 @@
+/* One result grid: sortable/resizable header, a filter box, Export CSV and
+   Copy as TSV, and a cell-viewer dialog. Sibling of QueryBrowser.css's own
+   .qb-result/.qb-scroll/.qb-table rules, which this still relies on. */
+
+.qb-result-filter {
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  min-width: 10em;
+}
+
+.qb-result-filter:focus-visible {
+  border-color: var(--accent-primary);
+}
+
+.qb-th-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-right: var(--space-2);
+}
+
+/* A sortable header is a button filling the <th>, not a link floating in it —
+   the whole cell is the hit target, and WCAG 2.1 AA wants a clear, generous
+   one for something this small. */
+.qb-sort-button {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: var(--space-1) var(--space-2);
+  margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2));
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-transform: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qb-sort-button:hover {
+  color: var(--text-primary);
+}
+
+.qb-sort-button:focus-visible {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+/* The Resizer component is built for a flex-row split pane (position:
+   relative, sized by flex-basis); pinned to the header cell's trailing edge
+   here instead, so column widths can be dragged with the SAME accessible,
+   pointer-capturing control the schema pane already uses. */
+.qb-th-inner .resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: calc(-1 * var(--space-2));
+  height: auto;
+}
+
+/* The <td> itself is the interactive unit (click or Enter opens the cell
+   viewer) — see ResultsGrid's own comment on why this is not a nested
+   <button> per cell. */
+.qb-cell {
+  cursor: pointer;
+  max-width: 32em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qb-cell:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+}
+
+.qb-cell:focus-visible {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -2px;
+}
+
+/* The cell viewer: a plain centred dialog, the same backdrop/shell recipe as
+   NewScriptDialog/QueryHistoryDialog — a third dialog shell would read as a
+   third application. */
+.qb-cellviewer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+}
+
+.qb-cellviewer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: min(640px, calc(100vw - var(--space-5) * 2));
+  max-height: min(480px, calc(100vh - var(--space-5) * 2));
+  padding: var(--space-4);
+  background: var(--glass-panel);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+}
+
+.qb-cellviewer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.qb-cellviewer-head h2 {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+.qb-cellviewer-head button {
+  padding: 0 var(--space-2);
+  height: var(--control-height);
+}
+
+.qb-cellviewer-note {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--accent-warning-bg);
+  border: 1px solid var(--accent-warning-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: var(--font-size-xs);
+}
+
+.qb-cellviewer-text {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-2);
+  overflow: auto;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.qb-cellviewer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

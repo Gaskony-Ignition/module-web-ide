@@ -1,0 +1,232 @@
+/* Query history. Same shape as RunHistoryDialog.css, deliberately — this is
+   the same kind of moment, a decision about something from history taken over
+   the top of the browser — but its own class prefix throughout: a CSS class
+   name is a shared claim, and this dialog's rows carry different fields. */
+
+.qhist-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5);
+  background: color-mix(in srgb, var(--bg-primary) 82%, transparent);
+  z-index: 20;
+}
+
+.qhist-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(1000px, 100%);
+  height: min(640px, 100%);
+  min-height: 0;
+  padding: var(--space-5);
+  background: var(--glass-panel);
+  backdrop-filter: var(--blur-panel);
+  -webkit-backdrop-filter: var(--blur-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-popup);
+}
+
+.qhist-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.qhist-head h2 {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+.qhist-close {
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: var(--font-size-code);
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 var(--space-1, 4px);
+}
+
+.qhist-close:hover {
+  color: var(--text-primary);
+}
+
+.qhist-body {
+  display: flex;
+  gap: var(--space-3);
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.qhist-list {
+  flex: 0 0 260px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+}
+
+.qhist-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.qhist-when {
+  font-variant-numeric: tabular-nums;
+}
+
+.qhist-empty {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: var(--font-size-base);
+}
+
+.qhist-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.qhist-note {
+  margin: 0;
+  font-size: var(--font-size-base);
+  max-width: 52ch;
+}
+
+.qhist-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.qhist-first {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.qhist-run {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 2px);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-bottom: 1px solid var(--border-light);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.qhist-run:hover {
+  background: var(--bg-tertiary);
+}
+
+.qhist-run.is-selected {
+  background: var(--accent-primary-bg);
+  box-shadow: inset 2px 0 0 var(--accent-primary);
+}
+
+.qhist-mark {
+  display: inline-block;
+  width: 1.2em;
+}
+
+.qhist-mark.is-ok {
+  color: var(--success);
+}
+
+.qhist-mark.is-failed {
+  color: var(--error);
+}
+
+.qhist-detail {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  background: var(--bg-secondary);
+  padding: var(--space-3);
+  gap: var(--space-2);
+}
+
+.qhist-section {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+.qhist-sql {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  tab-size: 4;
+}
+
+.qhist-result {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-secondary);
+}
+
+.qhist-search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 0 auto;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.qhist-filter {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0 var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+}
+
+.qhist-filter:focus-visible {
+  border-color: var(--accent-primary);
+}
+
+.qhist-count {
+  flex: 0 0 auto;
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}

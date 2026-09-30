@@ -1,0 +1,115 @@
+.code-editor {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  /* Without a zero minimum a long script pushes the editor past the viewport
+     instead of scrolling inside its own pane. */
+  min-height: 0;
+  overflow: hidden;
+  /* Transparent, NOT --bg-primary.
+     The lit ground lives on `.app` as an opaque colour plus --page-glow. An
+     opaque editor painted over it confined the glow to the outline rail, which
+     is the smallest surface in the app and the one nobody looks at — the code
+     area, which is most of the window, stayed flat. Transparent lets the
+     biggest surface carry the theme.
+     Safe on all ten: --page-glow is `none` on the seven solid packs, so they
+     get exactly the opaque --bg-primary they had, and on the glass packs every
+     text token is verified against the glow at its BRIGHTEST point. */
+  background-color: var(--bg-primary);
+  background-image: var(--page-glow);
+  background-attachment: fixed;
+}
+
+/* The column the CodeMirror hosts are appended to. Takes everything the ruler
+   beside it does not; the zero minimum is what lets a long line scroll inside
+   the editor instead of widening the pane. */
+.code-editor-views {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+}
+
+/* One host per open document. All but the active one are display:none — see the
+   one-view-per-document note in CodeEditor.tsx. */
+.code-editor-host {
+  height: 100%;
+}
+
+.code-editor .cm-editor {
+  height: 100%;
+}
+
+.code-editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+/* CodeMirror manages its own internal focus state (the blinking cursor) and
+   draws no outline of its own — don't fight that, but the pane still needs
+   ONE for a keyboard user tabbing through the shell, so it goes on the host
+   that wraps whichever view is current, the same 1px inset ring as every
+   other control. */
+.code-editor-host:focus-within {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -1px;
+}
+
+.code-editor-empty {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  color: var(--text-muted);
+}
+
+/*
+ * A line with a problem, marked ON ITS NUMBER.
+ *
+ * See lintLineGutter.ts. The overview ruler represents the whole document, so
+ * its mark is nowhere near the line when the file is long — the number is the
+ * thing a reader is already using to find a line, so that is what changes
+ * (Nigel, 04/09/2026: "sync the error display with the line number").
+ *
+ * Colour AND weight, not colour alone: `--error` and `--warning` are far apart
+ * in hue but a line number is four small digits, and weight is what makes the
+ * difference visible at that size. Nothing is added to the box, so no column
+ * appears and the code does not shift when a diagnostic arrives.
+ */
+.cm-lineNumbers .cm-lint-line {
+  font-weight: 700;
+}
+
+.cm-lineNumbers .cm-lint-line-error {
+  color: var(--error);
+}
+
+.cm-lineNumbers .cm-lint-line-warning {
+  color: var(--warning);
+}
+
+/*
+ * And the lint gutter's own dot, which shipped at the theme's default: a 3px
+ * speck at the far left of the editor, in CodeMirror's own red rather than the
+ * theme's. Sized to be findable and coloured from the same tokens as the number
+ * beside it, so a theme change moves both.
+ */
+.cm-gutter-lint {
+  width: 0.7em;
+}
+
+.cm-gutter-lint .cm-lint-marker {
+  width: 0.6em;
+  height: 0.6em;
+}
+
+.cm-gutter-lint .cm-lint-marker-error {
+  content: none;
+  background: var(--error);
+  border-radius: 50%;
+}
+
+.cm-gutter-lint .cm-lint-marker-warning {
+  content: none;
+  background: var(--warning);
+  border-radius: 50%;
+}

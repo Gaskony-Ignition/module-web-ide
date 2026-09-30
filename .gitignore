@@ -1,0 +1,48 @@
+# ── NEVER COMMIT ────────────────────────────────────────────────────────────
+# Module signing credentials. A PreToolUse hook in the workspace .claude/settings.json
+# also blocks these at commit time; this is the first line of defence.
+gradle.properties
+sign.props
+*.jks
+*.p12
+*.pfx
+
+# Build output
+build/
+.gradle/
+out/
+bin/
+
+# Python venv for the live suites (playwright). Self-ignoring via the .gitignore
+# venv writes inside itself, but named here too — that is an implementation
+# detail of the venv module, not a guarantee.
+.venv-test/
+.venv/
+
+# Frontend
+node_modules/
+web/build/
+*.tsbuildinfo
+
+# Local-only tooling config (gateway URLs, credentials paths)
+scripts/testing/config.local.json
+**/*.local.json
+**/*.local.sh
+**/*.local.md
+
+# OWASP / analysis reports
+dependency-check-report.*
+.owasp/
+
+# Editors & OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+*.swp
+
+# Jython package cache, written when the gateway tests run.
+.jython_cache/
+__pycache__/
+*.pyc
+

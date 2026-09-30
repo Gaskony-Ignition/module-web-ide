@@ -1,0 +1,272 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* The lit ground. `none` on the seven solid packs, two wide accent glows on
+     the glass ones — what the translucent chrome above is there to reveal.
+     Fixed, so it belongs to the window rather than scrolling with a panel.
+     The editor paints an opaque --bg-primary over it, so code is never read
+     against a gradient. */
+  background-color: var(--bg-primary);
+  background-image: var(--page-glow);
+  background-attachment: fixed;
+  /* min-height:0 lets a flex child actually shrink; without it a long panel
+     pushes the layout past the viewport instead of scrolling inside it. */
+  min-height: 0;
+}
+
+/* A title bar, not a page heading.
+ *
+ * 35px and 13px, which is VS Code's. The 1.2.0 header was 48px of padding
+ * around a 16px h1 — it read as the masthead of a web page, and every pixel of
+ * it came off the editor. */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--header-height);
+  flex: 0 0 var(--header-height);
+  /* More room on the right than the left: the theme select and the username sit
+     there, and at var(--space-3) the select ran to the very edge with `admin`
+     crowded against it. */
+  padding: 0 var(--space-4) 0 var(--space-3);
+  background: var(--bg-secondary);
+  border-bottom: var(--rule-width) solid var(--border-light);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.app-version {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.app-context {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.app-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--space-6) var(--space-5);
+}
+
+/*
+ * A popped-out single-feature tab (the console, the Query Browser) FILLS its
+ * tab.
+ *
+ * `.app-main`'s padding is for the signed-out and unreachable cards, which are
+ * centred notices that want air around them. Inherited by the console it framed
+ * the whole app in a 32px/24px border of `.app` — which is where the glass
+ * themes' --page-glow was showing through, teal at the top-left where that
+ * radial is centred, while the console painted flat inside it. Removing the
+ * padding is half of that fix; the console carrying the glow itself is the
+ * other half. `overflow: hidden` because each of these does its own scrolling
+ * in independent panes, and a scrollbar out here would scroll all of them at
+ * once.
+ */
+.app-main-console,
+.app-main-query {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* The signed-out / unreachable card.
+ *
+ * Renamed off `.panel` in 1.3.0: the bottom dock is also called a panel, its
+ * component is `Panel.tsx`, and the two stylesheets collided — this card's
+ * `max-width` and padding silently applied to the dock, which then rendered
+ * 640px wide inside a 1050px slot with an inset on every side. A class name
+ * this generic in an app-wide stylesheet is a trap for the next component that
+ * deserves the obvious word. */
+.notice-card {
+  max-width: 640px;
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.notice-card h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.notice-card-error {
+  border-color: var(--error);
+}
+
+.muted {
+  color: var(--text-secondary);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0 0 var(--space-4);
+}
+
+.facts dt {
+  color: var(--text-muted);
+}
+
+.facts dd {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+
+.button {
+  display: inline-block;
+  padding: var(--space-2) var(--space-4);
+  background: var(--accent-primary-bg);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius);
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.button:hover {
+  background: var(--accent-primary);
+  /* --accent-ink, not --bg-primary: the page happens to contrast with the
+     accent on all ten today, and nothing guarantees it. --accent-ink is
+     measured against the accent and asserted at generation time. */
+  color: var(--accent-ink);
+}
+
+.app-user {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+/* ---- theme picker (v1.1.0) ---- */
+
+.app-header-gap {
+  flex: 1 1 auto;
+}
+
+.theme-picker select {
+  height: var(--control-height);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius);
+  padding: 0 var(--space-2);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-xs);
+  /* Was 190px, which truncated "Newsprint — Night Edition" and left the theme
+     unreadable in the one control whose whole job is naming it. Wide enough for
+     the longest name in the set, and it still shrinks on a narrow window. */
+  max-width: 230px;
+}
+
+/* Visually hidden but still read by a screen reader — the select has a visible
+   value but no visible label, and "Theme" is what makes it navigable. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * The session-has-ended bar.
+ *
+ * Deliberately louder than the stale bar and deliberately not a notice: it is
+ * the one failure where the user has unsaved work and no way to write it
+ * (Nigel, 04/09/2026). It sits above the editor, uses the theme's error colour
+ * for its edge rather than its fill — a solid red band over code is hard to
+ * read past — and stays until it is dismissed or the save succeeds.
+ */
+.workspace-signedout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--error);
+  color: var(--text-primary);
+}
+
+.workspace-signedout > svg {
+  color: var(--error);
+  flex: 0 0 auto;
+}
+
+/* The one grower: the message takes the slack, the buttons keep their size. */
+.workspace-signedout-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.workspace-signedout .button {
+  flex: 0 0 auto;
+}
+
+/* The unparseable-save question (1.16.0).
+
+   Same shape as the session bar above — icon, message, two answers — because it
+   is the same kind of moment. WARNING rather than error on the edge: nothing has
+   gone wrong yet, and this is a question, not a failure. Its own class rather
+   than a modifier on `.workspace-signedout`, so a suite counting either one
+   cannot pick up the other. */
+/* Recovered work: the same shape as the save warning, in the ACCENT rather than
+   the warning colour. Nothing is wrong here — something was saved for you — and
+   a red-edged bar for good news is how people learn to dismiss bars. */
+.workspace-recover {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.workspace-recover > svg {
+  color: var(--accent-primary);
+  flex: 0 0 auto;
+}
+
+.workspace-recover .button {
+  flex: 0 0 auto;
+}
+
+.workspace-savewarn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--warning);
+  color: var(--text-primary);
+}
+
+.workspace-savewarn > svg {
+  color: var(--warning);
+  flex: 0 0 auto;
+}
+
+.workspace-savewarn .button {
+  flex: 0 0 auto;
+}
