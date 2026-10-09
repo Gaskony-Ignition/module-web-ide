@@ -2,6 +2,8 @@
 
 Write Ignition scripts in a real editor, in the browser, against the live gateway.
 
+> **Not an Inductive Automation product, and not supported by Inductive Automation.** Personal work, largely built with AI tools and tested for one purpose on one gateway. Take the ideas; fork and review it before it goes near production. [NOTICE.md](NOTICE.md) says more.
+
 **Module ID**: `com.gaskony.scriptide` · Ignition 8.3+
 
 ---
