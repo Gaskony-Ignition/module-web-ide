@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * GET /api/git/status?project=X — what has changed since the last commit.
  *
- * <p>Read-only, and there is no sibling that writes. Nigel's decision on
+ * <p>Read-only, and there is no sibling that writes. The decision of
  * 01/09/2026 stands: this module is not becoming a git module, and
  * {@code module-git} already exists for staging, committing and remotes. What is
  * here is the part a person wants while EDITING — which files differ — and it

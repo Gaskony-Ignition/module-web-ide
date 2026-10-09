@@ -3,7 +3,7 @@
  *
  * The Designer puts a narrow strip down the right of the code area with a mark
  * in line with every line that has a problem; hovering one shows the message.
- * Nigel asked for that here (03/09/2026) and for one thing the Designer does not
+ * That was asked for here (03/09/2026) and for one thing the Designer does not
  * do: **be able to take the text away**, to paste into a search or a message.
  *
  * Why this and not the Problems panel, which already existed: a defect
@@ -65,7 +65,7 @@ export function severityName(severity: number | undefined): string {
  * ruler, which is wrong whenever the document does not fill the editor: a
  * 28-line script in an 819px pane occupies about 530px of it, so line 28 was
  * drawn at the bottom of the ruler while the code it described sat two thirds
- * up. Nigel, 04/09/2026: "it seems to just appear randomly."
+ * up. 04/09/2026: "it seems to just appear randomly."
  *
  * `geometryOffset` below is the real answer and is used whenever a view exists.
  */

@@ -7,7 +7,7 @@
  * padding. With `padding-top: 8px` on .terminal-host the addon fitted 11 rows —
  * 220px — into a 216px content area, and `overflow: hidden` then ate the bottom
  * 4px of the last line. Measured on the live gateway, 02/09/2026: host 224px
- * tall with 8px of top padding, rows 220px. Nigel saw it as "the bottom of the
+ * tall with 8px of top padding, rows 220px. It was reported as "the bottom of the
  * text seems to be getting cut off even though it's a full screen".
  *
  * A fitted element gets no padding. Put the breathing room on its parent.

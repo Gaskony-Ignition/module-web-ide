@@ -253,7 +253,7 @@ export default function Workspace({ session }: WorkspaceProps) {
   /**
    * Documents shown in the SECOND editor pane.
    *
-   * Nigel, 03/09/2026: *"I'm not seeing a way to split the screen between 2 or
+   * 03/09/2026: *"I'm not seeing a way to split the screen between 2 or
    * more scripts so that I can do comparisons or copy and paste between."*
    *
    * A document lives in exactly ONE pane, and splitting MOVES it rather than
@@ -317,7 +317,7 @@ export default function Workspace({ session }: WorkspaceProps) {
    * for the length of that round trip the background listing legitimately
    * reports a signature the open document does not carry — and every check that
    * asks "has this moved on?" answered yes about the user's own keystroke.
-   * Nigel, 07/09/2026: *"when I click save while it is saving to the gateway a
+   * 07/09/2026: *"when I click save while it is saving to the gateway a
    * pull request pops up on the script which could be confusing for people. They
    * might think that there is a conflict."*
    */
@@ -370,7 +370,7 @@ export default function Workspace({ session }: WorkspaceProps) {
   /**
    * The session has ended — a gateway restart, or a timeout.
    *
-   * Nigel, 04/09/2026: *"I was working on some code and tried to save but it
+   * 04/09/2026: *"I was working on some code and tried to save but it
    * came up with an authentication error. This is tricky because i was logged
    * in but something happened in the backend... now I could potentially lose
    * work. how are we managing this?"* Until 1.13.0 the answer was: badly. The
@@ -388,8 +388,8 @@ export default function Workspace({ session }: WorkspaceProps) {
   /**
    * The bottom panel.
    *
-   * Console and Terminal live here rather than beside the editor (Nigel,
-   * 01/09/2026). A console needs to be wide and short — it prints lines — and
+   * Console and Terminal live here rather than beside the editor
+   * (01/09/2026). A console needs to be wide and short — it prints lines — and
    * putting it beside the code halves the width of both. `panelTab` survives the
    * panel being closed so reopening returns to what you were using.
    */
@@ -471,7 +471,7 @@ export default function Workspace({ session }: WorkspaceProps) {
    *
    * Read-only. `module-git` does the staging and committing; this is the half a
    * person wants while editing — which of these files have I touched — and it
-   * stops there (Nigel, 01/09/2026).
+   * stops there (01/09/2026).
    */
   const [git, setGit] = useState<GitState>(NO_GIT);
 
@@ -807,7 +807,7 @@ export default function Workspace({ session }: WorkspaceProps) {
    *
    * Until 1.8.5 nothing here ever re-read anything: the listing was refetched
    * only after this app's OWN mutations, so a script edited in the Designer
-   * stayed invisible until a save 409'd (Nigel, 03/09/2026 — "The change did
+   * stayed invisible until a save 409'd (03/09/2026 — "The change did
    * not show up"). Reopening the same script from the tree did not help either;
    * `openScript` just refocuses the existing tab.
    *
@@ -840,7 +840,7 @@ export default function Workspace({ session }: WorkspaceProps) {
           /* A background poll that fails is not worth a notice: the next one
              may well succeed, and the save path still has If-Match behind it.
              A 401 is the exception — it is not a blip, it is the session gone,
-             and finding out at save time is what cost Nigel a scare on
+             and finding out at save time is what caused a scare on
              04/09/2026. The poll runs every 20 s, so this surfaces within one
              interval instead of at the next Ctrl+S. */
           if (e instanceof ApiError && e.isUnauthenticated) setSignedOut('');
@@ -1159,7 +1159,7 @@ export default function Workspace({ session }: WorkspaceProps) {
   /**
    * Close a tab — asking first when that would throw work away.
    *
-   * Until 1.8.8 this discarded an unsaved buffer silently (Nigel, 04/09/2026:
+   * Until 1.8.8 this discarded an unsaved buffer silently (04/09/2026:
    * "I can close a tab that has unsaved changes without any notice or
    * anything"). Nothing else in this app destroys user input without a prompt,
    * and a close button is the easiest thing on screen to hit by accident —
@@ -1361,7 +1361,7 @@ export default function Workspace({ session }: WorkspaceProps) {
   /**
    * A signature that moved without the CONTENT moving is not a change.
    *
-   * Nigel, 04/09/2026: *"I know for a fact that no changes were made via the
+   * 04/09/2026: *"I know for a fact that no changes were made via the
    * designer because I am the only one with access and I don't even have the
    * designer open. when i click on the compare I couldn't see any
    * differences"* — and then, after reloading the page, *"it stopped showing
@@ -2622,7 +2622,7 @@ export default function Workspace({ session }: WorkspaceProps) {
    *
    * Until 1.5.0 this called `createScript` on the click itself — the real
    * Designer creates nothing until you save, and a click here was writing to
-   * the live project with no confirmation (Nigel, 02/09/2026: browsing the
+   * the live project with no confirmation (02/09/2026: browsing the
    * tree should not add resources, or git diffs, to a project). Separate from
    * `doCreate` because a singleton has no name to ask for — its resource path
    * is `<module>/<type>` with no third segment — and unlike a NAMED create
@@ -2694,7 +2694,7 @@ export default function Workspace({ session }: WorkspaceProps) {
               <PresenceBar peers={activePresence} designerFeed={presence.designerFeed} />
               {/* A bar on the document itself, not only a marker in the strip.
                   The tab's arrow and the toolbar count were both missable
-                  (Nigel, 04/09/2026: "a bit to easy to miss"), and neither is
+                  (04/09/2026: "a bit to easy to miss"), and neither is
                   where you are looking — which is at the code. This sits between
                   the tab and the buffer it is about, and only for the document
                   actually on screen. */}
@@ -2905,7 +2905,7 @@ export default function Workspace({ session }: WorkspaceProps) {
                   // The inheritance state shares the settings row rather than
                   // taking one of its own. Two chrome rows above the code cost
                   // ~70px for two short sentences that are never both true
-                  // (Nigel, 02/09/2026).
+                  // (02/09/2026).
                   leading={inheritanceNotice}
                   editable={activeAttrs.editable}
                   attributes={activeAttrs.attributes}
@@ -3239,7 +3239,7 @@ export default function Workspace({ session }: WorkspaceProps) {
                 pane is holding it, never duplicated. Two settings rows side by
                 side would halve the width of a row nobody edits often, for the
                 same reason the inheritance note shares that row rather than
-                taking one of its own; and what Nigel asked to compare is the
+                taking one of its own; and what was asked to compare is the
                 CODE. */}
             <div className={`workspace-panes${splitUris.size > 0 ? ' is-split' : ''}`}>
               <div
@@ -3277,7 +3277,7 @@ export default function Workspace({ session }: WorkspaceProps) {
                   lsp={lsp}
                   // A ruler mark: put the caret on the problem AND open Problems
                   // on it, so the message is readable and copyable in one click —
-                  // the Designer stops at the hover (Nigel, 03/09/2026).
+                  // the Designer stops at the hover (03/09/2026).
                   onRevealProblem={(line, character) => {
                     jumpToLine(line, character);
                     showPanel('problems');

@@ -486,7 +486,7 @@ const lspTheme = EditorView.theme({
     // two glass packs `--surface` is the pack's own film,
     // `rgba(255,255,255,0.10)` — so the hover card was 10% opaque and the
     // lines underneath read straight through the documentation on top of them
-    // (Nigel, 04/09/2026: "the hover over information display here needs to be
+    // (04/09/2026: "the hover over information display here needs to be
     // more solid as its not readable right now").
     //
     // `--glass-panel` is that same film ALREADY COMPOSITED over the page and

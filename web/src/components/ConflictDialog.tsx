@@ -43,7 +43,7 @@ export default function ConflictDialog({
   const rows = useMemo(() => diffLines(mine, theirs), [mine, theirs]);
   // A diff with nothing changed in it. It happens when the resource SIGNATURE
   // moved and the bytes did not — a gateway restart re-stamps resources — and
-  // showing two identical columns with no comment is what Nigel hit on
+  // showing two identical columns with no comment is what was hit on
   // 04/09/2026: "when i click on the compare I couldn't see any differences".
   // There were none. Saying so is the whole fix; guessing is not.
   const identical = mine === theirs;

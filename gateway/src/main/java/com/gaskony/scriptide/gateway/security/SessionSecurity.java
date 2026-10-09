@@ -115,7 +115,7 @@ public final class SessionSecurity {
     /**
      * Whether this request may WRITE to the gateway, as the platform judges it.
      *
-     * <p>Nigel, 04/09/2026: <em>"If write access is available to the gateway then
+     * <p>04/09/2026: <em>"If write access is available to the gateway then
      * its authentication is accepted."</em> That is the rule, and this is the
      * platform's own answer to it — {@code WebUiSession.SESSION_WRITE} is the
      * same strategy the Gateway's own config pages are mounted behind.</p>
@@ -137,7 +137,7 @@ public final class SessionSecurity {
      * module nobody could save from.</p>
      *
      * <p>So either answer grants: the platform saying this session may write,
-     * OR the {@code Administrator} role. That is the widening Nigel asked for —
+     * OR the {@code Administrator} role. That is the widening that was asked for —
      * an estate that grants write some other way gets in, and every estate that
      * worked before still does — without betting the whole module on one SDK
      * constant whose meaning is not what its name suggests.</p>

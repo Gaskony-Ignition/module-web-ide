@@ -161,7 +161,7 @@
  *
  * It is a BORDERED CHIP with a word in it, not an icon in muted grey. Until
  * 1.18.0 it was a bare `⇹` at --text-muted, the same weight as the decoration
- * around it, and Nigel found it only by going looking for it (07/09/2026):
+ * around it, and it was found only by going looking for it (07/09/2026):
  * "the button is so small I didn't even notice it". The three things that fix
  * that are all here — a border so it reads as a control, --text-secondary so it
  * is not quieter than the tab labels beside it, and a label so a reader knows

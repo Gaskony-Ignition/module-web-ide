@@ -310,8 +310,8 @@ export default function CodeEditor({
    *
    * Measured from CodeMirror rather than computed from the line count: a
    * document that does not fill the pane occupies only part of it, and spreading
-   * the lines evenly put every mark below the code it described (Nigel,
-   * 04/09/2026). `lineBlockAt` also gets wrapped lines and folded ranges right,
+   * the lines evenly put every mark below the code it described
+   * (04/09/2026). `lineBlockAt` also gets wrapped lines and folded ranges right,
    * which no arithmetic on line numbers can.
    */
   const offsetOfLine = useCallback((line: number): number | null => {
@@ -503,7 +503,7 @@ function baseExtensions(
     // `lintLineGutter` colours the LINE NUMBER beside it — the overview ruler
     // maps the whole document, so a fault on line 22 of 190 sits near the top
     // of it whatever is on screen, which reads as a mark in the wrong place
-    // until the line itself carries one too (Nigel, 04/09/2026).
+    // until the line itself carries one too (04/09/2026).
     //
     // ONLY on a Python view. The language server is a Jython server: point it at
     // SQL, or at the HTML of a Web Dev text resource, and it parses the file as

@@ -193,7 +193,7 @@ describe('formatSize', () => {
 
 describe('expansion', () => {
   it('ships collapsed — nothing remembered means nothing open', () => {
-    // Nigel, 04/09/2026: "I want by default the WebDev to start shrunk".
+    // 04/09/2026: "I want by default the WebDev to start shrunk".
     // It tracked the COLLAPSED keys until 1.12.2, so an empty set meant every
     // endpoint open — and a python endpoint opens EIGHT rows, one per verb.
     render(

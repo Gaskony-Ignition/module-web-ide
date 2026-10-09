@@ -147,7 +147,7 @@ def accent_bg(hex_colour: str, dark: bool) -> str:
 #
 # Colour was the whole of a theme here until the themes pass, and it is why all
 # ten read as one VS Code-shaped shell recoloured while the Perspective sessions
-# beside them read as ten products (Nigel, 02/09/2026). The packs carry GEOMETRY as well,
+# beside them read as ten products (02/09/2026). The packs carry GEOMETRY as well,
 # and it varies far more than the palettes do: `radius.card` runs from 0 on
 # `newsprint-night` to 18px on the aurora pair, and four of the ten packs name
 # no shadow at all.
@@ -305,7 +305,7 @@ def softness(tokens: dict) -> float:
     Half the card radius, half whether it casts a shadow at all — the two
     signals every one of these packs carries, and the two a reader sees first.
     `newsprint-night` scores 0 and `aurora-*`/`nord-*` score 1, which is exactly
-    the difference Nigel is asking about.
+    the difference being asked about.
 
     It is used to scale the neutral ramp: a flat theme has to separate its
     chrome with a STEP, because it has no shadow and no rounding to do it with,
@@ -390,7 +390,7 @@ BORDER_SOURCES = ("border.card", "border.sidebar", "border.table-cell", "border.
 #
 # Geometry and colour were the whole of a theme here until 1.8.0, and it is why
 # `aurora-teal` came out "a plain teal" beside the Perspective session wearing
-# the same pack (Nigel, 03/09/2026). The glass in Glass Aurora is not a colour.
+# the same pack (03/09/2026). The glass in Glass Aurora is not a colour.
 # It is a MATERIAL: translucent white films stacked over a lit ground, with a
 # 22%-white hairline along each edge where the light catches it.
 #
@@ -507,7 +507,7 @@ GLASS_PANEL_ALPHA = 0.78
 # and a gradient is a background-IMAGE, so the live gate cannot see it. It has
 # to be bounded here or it is not bounded anywhere.
 # Pushed hard, deliberately. At 0.20 the ground read as "a flat violet with a
-# faint tint in one corner" (Nigel, 03/09/2026: "still quite a bit of the
+# faint tint in one corner" (03/09/2026: "still quite a bit of the
 # styling feels a bit dull"). The glow is what carries a glass theme's identity:
 # the aurora pair share one authored ground by design, so if the ground is the
 # only colour on screen they are the same theme twice. At 0.42 the teal pack
@@ -550,7 +550,7 @@ def page_glow(tokens: dict, page, glass: bool, dark: bool, accent: str) -> str:
     """
     # Not glass, but not nothing.
     #
-    # Nigel, 03/09/2026: this is about the whole suite, not the two glass packs.
+    # 03/09/2026: this is about the whole suite, not the two glass packs.
     # A wash scaled by how SOFT the pack is, because that is the axis the packs
     # already differ on: `nord-*` and `leather-parchment` are rounded, shadowed
     # and soft, and a gentle light in one corner is exactly their character.
@@ -793,7 +793,7 @@ ACCENT_TINT = 0.30
 
 # ---- the ground's own colour ----------------------------------------------
 #
-# Nigel, 03/09/2026: *"still quite a bit of the styling feels a bit dull… the
+# 03/09/2026: *"still quite a bit of the styling feels a bit dull… the
 # different themes really feel beautiful and provide that bit of variety."*
 #
 # Measured 04/09/2026, and the numbers say it plainly. The four LIGHT packs
@@ -1195,7 +1195,7 @@ def block(pack: dict, report: list[str]) -> str:
     # It cost the estate its two best-looking themes: `aurora-teal` and
     # `aurora-violet` share one violet ground (#1a1233) and differ by which
     # colour glows on it — that shared ground IS Glass Aurora. The tint swung
-    # aurora-teal's ground to hue 203, actual teal, and Nigel's word for the
+    # aurora-teal's ground to hue 203, actual teal, and the requested word for the
     # result was "plain" (03/09/2026). The pack already distinguishes siblings
     # by accent; rotating the ground only destroys the family.
     page = opaque_page(tokens, dark)
@@ -1451,7 +1451,7 @@ def block(pack: dict, report: list[str]) -> str:
         # The ceiling was 6px until 1.7.1 and SEVEN of the ten packs exceeded
         # it, so seven themes came out with identical rows. Measured in the
         # browser, not read off the packs: the tokens differed on paper and the
-        # painted values did not (Nigel: "they all look the same as before").
+        # painted values did not ("they all look the same as before").
         "--radius-row": _px(tokens.get("radius.nav"), 0, 8, "0"),
         # The rule under a strip or a head. Only `finance-ledger` doubles it,
         # and a ledger drawn with a heavier rule is exactly what it is for.

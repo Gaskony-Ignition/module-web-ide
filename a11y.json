@@ -1,9 +1,10 @@
 {
+  "_comment": "web URLs are absolute: replace GATEWAY with the test gateway host before running a11y-gate.sh",
   "gateway": "module-testing",
   "web": [
-    "http://192.168.153.128:8088/data/scriptide/",
-    "http://192.168.153.128:8088/data/scriptide/?view=console&project=Template",
-    "http://192.168.153.128:8088/data/scriptide/?view=query&project=Template"
+    "http://GATEWAY:8088/data/scriptide/",
+    "http://GATEWAY:8088/data/scriptide/?view=console&project=Template",
+    "http://GATEWAY:8088/data/scriptide/?view=query&project=Template"
   ],
   "login": true,
   "exceptions": [

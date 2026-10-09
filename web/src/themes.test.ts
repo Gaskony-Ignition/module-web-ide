@@ -161,7 +161,7 @@ describe('themes.generated.css', () => {
   it('gives every theme the geometry tokens, not just a palette', () => {
     // The 1.6.x themes were nineteen tokens each, all colour, so all ten were
     // one VS Code-shaped shell recoloured while the Perspective sessions beside
-    // them read as ten products (Nigel, 02/09/2026). Geometry is what fixes
+    // them read as ten products (02/09/2026). Geometry is what fixes
     // that, and a theme missing one of these silently falls back to another
     // theme's — the blocks are all :root-level, so nothing resets between them.
     const required = [
@@ -204,7 +204,7 @@ describe('themes.generated.css', () => {
   });
 
   it('keeps --control-height a real height inside the band the chrome allows', () => {
-    // "Set the height, not the padding" (Nigel, 02/09/2026). Below 20px a
+    // "Set the height, not the padding" (02/09/2026). Below 20px a
     // <select> clips its own text and 13px row text loses its descenders.
     //
     // The ceiling was 26px while the toolbar and config strip were hardcoded
@@ -220,7 +220,7 @@ describe('themes.generated.css', () => {
   });
 
   it('leaves the ten themes GEOMETRICALLY distinct, not just recoloured', () => {
-    // The defect this guards (Nigel, 03/09/2026: "still all look the same"):
+    // The defect this guards (03/09/2026: "still all look the same"):
     // 1.7.0 shipped per-theme geometry that every unit test passed and nobody
     // could see. The tokens were emitted, the selectors were right, the CSS
     // reached the browser — and _px clamped --radius-panel at 12px when five
@@ -273,7 +273,7 @@ describe('themes.generated.css', () => {
   });
 
   it('keeps each pack on the ground it was authored with', () => {
-    // Nigel, 03/09/2026: the aurora pair "just look like a plain teal or
+    // 03/09/2026: the aurora pair "just look like a plain teal or
     // violet". They should not look like either — in Perspective both wear the
     // SAME violet ground (#1a1233) and differ only in which colour glows on it,
     // and that shared ground is what Glass Aurora is. This file used to mix the

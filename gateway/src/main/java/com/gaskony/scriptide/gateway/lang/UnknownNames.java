@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * Names a module USES and never BINDS — the check that catches typed rubbish.
  *
- * <p>Nigel, 04/09/2026, having typed {@code j;sdfj;asdfjk;dksfj} into a script:
+ * <p>04/09/2026, having typed {@code j;sdfj;asdfjk;dksfj} into a script:
  * <em>"I can put absolute garbage in here and it doesn't show up as an error
  * which it really should"</em>. He is right, and the parser is right too: that
  * line is four semicolon-separated expression statements and is perfectly valid

@@ -88,7 +88,7 @@
  * A changed line, marked three ways: fill, edge and glyph.
  *
  * The 22% wash it shipped with was the only signal, and on a light theme over
- * a monospace column it is close to invisible — Nigel, 04/09/2026: "I need
+ * a monospace column it is close to invisible — 04/09/2026: "I need
  * those differences to be highlighted clearly in any case". A wash alone also
  * says nothing when a reader is scrolling a long file looking for the change;
  * the solid edge is what carries at a glance, and the glyph is what survives

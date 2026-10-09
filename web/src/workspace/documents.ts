@@ -195,7 +195,7 @@ export function sameSignature(a: string | undefined, b: string | undefined): boo
  * True when the gateway's copy has moved on from what this tab was opened at.
  *
  * The case this exists for: a script edited in the DESIGNER while it sits open
- * here (Nigel, 03/09/2026 — "The change did not show up"). Nothing was ever at
+ * here (03/09/2026 — "The change did not show up"). Nothing was ever at
  * risk of being silently overwritten, because the save carries `If-Match` and
  * the gateway answers 409 — but a conflict dialog at save time is a late and
  * disruptive way to learn something you would have wanted to know before you

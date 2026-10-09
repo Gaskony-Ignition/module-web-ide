@@ -212,7 +212,7 @@ public final class ScriptIdePaths {
      * last commit.
      *
      * <p>READ-ONLY, and this module has no route that writes to a repository.
-     * Nigel's decision on 01/09/2026: staging, committing and remotes belong to
+     * a decision on 01/09/2026: staging, committing and remotes belong to
      * {@code module-git}. This answers the question a person has while editing —
      * what have I changed — and nothing beyond it.</p>
      */

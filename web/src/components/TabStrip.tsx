@@ -40,7 +40,7 @@ export interface TabStripProps {
    *
    * It carries a visible label rather than a glyph alone because it did not:
    * until 1.18.0 this was a bare `⇹` in muted grey at the far end of the strip,
-   * and Nigel found it only by going looking for it (07/09/2026). An action
+   * and it was found only by going looking for it (07/09/2026). An action
    * nobody can see is not discoverable by being present.
    */
   splitText?: string;

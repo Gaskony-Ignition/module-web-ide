@@ -201,7 +201,7 @@ describe('saveScriptContent', () => {
     // Measured on the rig, 04/09/2026. The servlet container answers a 401
     // with {message, url, status}, and taking the whole object printed that
     // JSON verbatim on screen: `Could not save api: { "message":"Unauthorized",
-    // "url":"/data/scriptide/api/...", "status":"401" }` (Nigel).
+    // "url":"/data/scriptide/api/...", "status":"401" }`.
     fetchMock.mockResolvedValue(new Response(
       JSON.stringify({ message: 'Unauthorized', url: '/data/scriptide/api/x', status: '401' }),
       { status: 401 }

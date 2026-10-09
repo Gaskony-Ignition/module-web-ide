@@ -9,7 +9,7 @@
  * opens the standalone full-page SPA in a NEW TAB and leaves the Gateway page
  * where it was.
  *
- * A new tab, not a redirect (Nigel, 01/09/2026): the IDE is a place you sit in
+ * A new tab, not a redirect (01/09/2026): the IDE is a place you sit in
  * for a while with unsaved buffers, so taking over the Gateway tab means the
  * Back button lands you on a page holding editors you did not mean to leave.
  *

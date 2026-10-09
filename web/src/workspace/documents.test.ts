@@ -232,7 +232,7 @@ describe('newQueryDoc', () => {
 describe('isStale', () => {
   it('is stale when the gateway signature has moved on', () => {
     // The case it exists for: someone edited the script in the Designer while
-    // this tab sat open (Nigel, 03/09/2026).
+    // this tab sat open (03/09/2026).
     expect(isStale(scriptDoc({ etag: 'sig-1' }), 'sig-2')).toBe(true);
   });
 

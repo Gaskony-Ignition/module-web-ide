@@ -164,7 +164,7 @@
    * `padding: 1px var(--space-2)` and no height, so the browser sized them from
    * their content. A <select> and a <button> with the same padding come out
    * different heights, and in a 30px bar both looked squashed and the button
-   * touched the border (Nigel, 02/09/2026: "squished... bleeding into the
+   * touched the border (02/09/2026: "squished... bleeding into the
    * edges"). Set the height, not the padding.
    *
    * A theme moves it with --control-height, 22-28px across the ten packs.
@@ -200,7 +200,7 @@
    * Nearly square. VS Code's chrome is flat; rounded corners read as a web app
    * dropped into a tool, which is exactly the impression to avoid here — but
    * `nord` and `aurora` are rounded in Perspective, and an IDE that ignores
-   * that is the same shell recoloured (Nigel, 02/09/2026).
+   * that is the same shell recoloured (02/09/2026).
    */
   --radius: 3px;              /* controls: buttons, inputs, selects, tabs */
   --radius-panel: 3px;        /* framed and floating surfaces */

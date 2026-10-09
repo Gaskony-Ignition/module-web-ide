@@ -28,7 +28,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
  * shows up as contradictory UI.</p>
  *
  * <p>This class only reads. There is no stage, commit, fetch or checkout here
- * and there should never be one: Nigel's decision on 01/09/2026 is that this
+ * and there should never be one: a decision on 01/09/2026 is that this
  * module is not becoming a git module.</p>
  */
 public final class GitProbe {

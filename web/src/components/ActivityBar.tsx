@@ -14,7 +14,7 @@
  * The lower group is different in kind and is separated by the gap between them:
  * those two open the bottom PANEL rather than the side bar. Script Console used
  * to be a row in the script tree, where it read as a script among scripts;
- * Nigel asked for it out of the tree once it had an icon of its own.
+ * It was asked to move out of the tree once it had an icon of its own.
  *
  * Search arrived in 1.6.0 and the view behind it is real: it searches every
  * Project Library script on the gateway through `scriptide/searchText`, and it

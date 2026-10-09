@@ -67,7 +67,7 @@ const SCRIPTS: ScriptEntry[] = [
 /**
  * Render the tree with every branch OPEN.
  *
- * The tree ships collapsed (Nigel, 02/09/2026): a whole project's scripts with
+ * The tree ships collapsed (02/09/2026): a whole project's scripts with
  * every group open on landing is a column that has to be scrolled before
  * anything can be chosen, and quick open is the fast path now. Almost every
  * check below is about what a branch CONTAINS, though, so they open it first —
@@ -167,7 +167,7 @@ describe('FileTree', () => {
 
   it('keeps the Script Console out of the tree', () => {
     // It was a row here in 1.1.0-1.2.0 and read as a script among scripts
-    // (Nigel, 01/09/2026). It lives on the activity bar and in the bottom panel
+    // (01/09/2026). It lives on the activity bar and in the bottom panel
     // now, and a second entry point in the tree would be two ways to open one
     // thing.
     render(<FileTree scripts={SCRIPTS} selectedPath={null} onSelect={vi.fn()} />);
@@ -471,7 +471,7 @@ describe('FileTree defaults', () => {
   ];
 
   it('ships COLLAPSED — nothing is open until a branch is chosen', () => {
-    // Nigel, 02/09/2026. A whole project's scripts with every group open on
+    // 02/09/2026. A whole project's scripts with every group open on
     // landing is a column of rows that has to be scrolled before anything can be
     // chosen; quick open (Ctrl+P) is the fast path now, and the tree is for
     // browsing, which starts by picking a branch.
@@ -483,7 +483,7 @@ describe('FileTree defaults', () => {
   });
 
   it('remembers open branches across an UNMOUNT, which is what a view switch is', () => {
-    // Nigel, 03/09/2026: "everytime I shift between a section it resets to
+    // 03/09/2026: "everytime I shift between a section it resets to
     // default". The activity-bar views are a `? :` chain, so switching to Web
     // Dev does not hide this tree, it removes it — and plain useState went with
     // it. Unmounting and remounting here is exactly what that switch does.
@@ -514,7 +514,7 @@ describe('FileTree defaults', () => {
   });
 
   it('does NOT list Web Dev endpoints — they have their own view', () => {
-    // Nigel, 02/09/2026: with a Web Dev tab on the activity bar there is no
+    // 02/09/2026: with a Web Dev tab on the activity bar there is no
     // reason for a second entry point in the script tree. The dedicated view is
     // the richer one (per-endpoint verbs, the config dialog), and listing them
     // in both made the poorer one the first that people found.

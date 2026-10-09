@@ -24,7 +24,7 @@
  * across the group — folders-then-leaves, each alphabetical, which is the rule
  * the whole Designer tree follows. Until 1.3.0 this listed the singletons first
  * AND rendered them as collapsible folders containing one nameless row, which is
- * two things the Designer does not do (Nigel, 01/09/2026).
+ * two things the Designer does not do (01/09/2026).
  *
  * Two row decorations are measured too: a singleton's label is **bold** once it
  * has been created, and a disabled event script carries a badge.
@@ -119,7 +119,7 @@ const GATEWAY_EVENT_TYPES: ScriptTypeId[] = [
  * Web Dev endpoints have their own activity-bar view — a whole tree of their
  * own, with the per-endpoint verbs and the config dialog the script tree cannot
  * offer. Listing them here as well gave every endpoint two homes and made the
- * one with fewer affordances the first one people found (Nigel, 02/09/2026).
+ * one with fewer affordances the first one people found (02/09/2026).
  *
  * Distinct from {@link unknownGroups}, which is the catch-all for a type this
  * build has never heard of: that one still renders, because silently dropping a
@@ -241,7 +241,7 @@ export default function FileTree({
   gitMarks,
 }: FileTreeProps) {
   /**
-   * Which branches are OPEN. Everything starts shut (Nigel, 02/09/2026).
+   * Which branches are OPEN. Everything starts shut (02/09/2026).
    *
    * Tracked as "expanded" rather than "collapsed" so that default falls out of
    * the empty set: the alternative — a collapsed set seeded with every key —

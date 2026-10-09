@@ -197,7 +197,7 @@ export class ApiError extends Error {
    * The session is gone — the gateway restarted, or the session timed out.
    *
    * Its own predicate because it is the one failure where the message is the
-   * least useful part of the answer. Nigel, 04/09/2026, on losing a session
+   * least useful part of the answer. A report of 04/09/2026, on losing a session
    * mid-edit: *"it came up with an authentication error... now I could
    * potentially lose work. how are we managing this?"* — what the user needs
    * is a way back in and their buffer left alone, not the status.
@@ -253,7 +253,7 @@ export async function toApiError(response: Response): Promise<ApiError> {
         // container answers with — its 401 body is
         // `{"message":"Unauthorized","url":"...","status":"401"}`, and taking
         // the whole object put that JSON on screen verbatim under "Could not
-        // save api:" (Nigel, 04/09/2026). Read the field, never the envelope.
+        // save api:" (04/09/2026). Read the field, never the envelope.
         const parsed = JSON.parse(text) as { error?: string; message?: string };
         message = parsed.error ?? parsed.message ?? `HTTP ${response.status}`;
       } catch {

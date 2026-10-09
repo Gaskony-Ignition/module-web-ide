@@ -55,7 +55,7 @@ public final class TerminalPolicy {
     /**
      * Whether a new terminal should try to become root.
      *
-     * <p>Defaults to {@code true} (Nigel, 01/09/2026): the terminal exists to
+     * <p>Defaults to {@code true} (01/09/2026): the terminal exists to
      * administer a container, and a shell that cannot install a package or read
      * a log outside the data directory is a shell you have to leave to do the
      * work.</p>

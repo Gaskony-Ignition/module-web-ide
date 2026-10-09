@@ -4,7 +4,7 @@
  * Two tabs today, Script Console and Terminal, laid out the way VS Code lays out
  * its own — 11px uppercase labels along the top, actions for the ACTIVE tab
  * right-aligned, then maximise and close. Both were floating panes before 1.3.0,
- * and Nigel's note is the reason they are not any more: a console that opens
+ * and a review note is the reason they are not any more: a console that opens
  * beside the editor competes with it for width, when the thing a console
  * actually needs is a wide, short strip under the code it is about.
  *

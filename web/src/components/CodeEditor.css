@@ -68,7 +68,7 @@
  * See lintLineGutter.ts. The overview ruler represents the whole document, so
  * its mark is nowhere near the line when the file is long — the number is the
  * thing a reader is already using to find a line, so that is what changes
- * (Nigel, 04/09/2026: "sync the error display with the line number").
+ * (04/09/2026: "sync the error display with the line number").
  *
  * Colour AND weight, not colour alone: `--error` and `--warning` are far apart
  * in hue but a line number is four small digits, and weight is what makes the

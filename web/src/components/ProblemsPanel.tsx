@@ -252,7 +252,7 @@ export default function ProblemsPanel({ docs, lsp, onOpen, project }: ProblemsPa
               </button>
               {/* Take the text away. A parser message is what you paste into a
                   search or a question, and selecting it out of a button by hand
-                  is not something a button lets you do (Nigel, 03/09/2026). */}
+                  is not something a button lets you do (03/09/2026). */}
               <button
                 type="button"
                 className="problems-copy"

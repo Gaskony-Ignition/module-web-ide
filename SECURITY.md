@@ -283,4 +283,4 @@ killed.
 
 ## Reporting
 
-Internal module. Raise anything you find with Nigel directly.
+Report anything you find through the repository's Issues tab.

@@ -44,7 +44,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Export and import project resources, in the Designer's own zip format.
  *
- * <p>Nigel, 07/09/2026: <em>"there is no export/import code options like in the
+ * <p>07/09/2026: <em>"there is no export/import code options like in the
  * designer"</em>, and asked for the Designer-compatible resource zip rather than
  * plain {@code .py} files. That choice is only worth anything if the two tools
  * can read each other's files, so the format was MEASURED off the real Designer

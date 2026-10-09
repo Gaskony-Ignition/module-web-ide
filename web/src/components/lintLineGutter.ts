@@ -1,7 +1,7 @@
 /**
  * Mark the LINE NUMBER of a line that has a problem.
  *
- * Nigel, 04/09/2026, of the overview ruler: *"I intentionally put in a faulted
+ * A report of 04/09/2026, on the overview ruler: *"I intentionally put in a faulted
  * line of code and then the error mark showed up high instead of in line with
  * the actual line of code. I'm wondering if it makes sense to move it to the
  * left side and sync the error display with the line number instead?"*

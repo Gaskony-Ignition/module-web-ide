@@ -128,7 +128,7 @@ public class ScriptIdeRouteRegistrar {
 
         AccessControlStrategy authed = SessionSecurity.requireAuthenticated();
         // "If write access is available to the gateway then its authentication is
-        // accepted" (Nigel, 04/09/2026). The platform's own SESSION_WRITE, not a
+        // accepted" (04/09/2026). The platform's own SESSION_WRITE, not a
         // role named Administrator — see SessionSecurity.canWriteGateway.
         AccessControlStrategy admin = SessionSecurity.requireGatewayWrite();
         routes.newRoute(ScriptIdePaths.ROUTE_PROJECTS)

@@ -130,7 +130,7 @@ public final class ScriptIdeSocketRegistry {
      * client is looking at, so the two features agree by construction and a
      * project nobody has open is never walked.</p>
      *
-     * <p>Read-only, and deliberately so. Nigel's decision on 01/09/2026 is that
+     * <p>Read-only, and deliberately so. A decision on 01/09/2026 is that
      * this module is not becoming a git module — {@code module-git} exists. What
      * is here is the VS Code-shaped half: which resources differ from the last
      * commit, and nothing that changes a repository.</p>

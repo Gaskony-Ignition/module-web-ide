@@ -235,7 +235,7 @@ const LIBRARY_ROOT = 'ignition/script-python/';
  * `rows` is the original layout and stays the default — it is what the
  * Designer's console does, and a wide short output block is worse for a
  * traceback than a tall narrow one. `columns` exists because a wide monitor
- * running a stacked console wastes most of its width, which is Nigel's
+ * running a stacked console wastes most of its width, which is the
  * complaint (07/09/2026): the two were "fixed at 50/50" and could not be put
  * side by side.
  */

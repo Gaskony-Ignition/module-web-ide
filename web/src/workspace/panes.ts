@@ -1,7 +1,7 @@
 /**
  * Which editor pane each document is in, and which one each pane is showing.
  *
- * Nigel, 03/09/2026: *"I'm not seeing a way to split the screen between 2 or
+ * 03/09/2026: *"I'm not seeing a way to split the screen between 2 or
  * more scripts so that I can do comparisons or copy and paste between."*
  *
  * The rules live here, as pure functions over a small state, because they are

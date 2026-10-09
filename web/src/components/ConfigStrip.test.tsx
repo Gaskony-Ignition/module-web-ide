@@ -78,7 +78,7 @@ describe('ConfigStrip', () => {
     // The Designer puts this at the top-right of the editor header, small, and
     // says nothing about it. 1.4.0's first attempt gave the rarest control on
     // the strip a paragraph of explanation and so made it the loudest thing on
-    // it (Nigel, 01/09/2026). The explanation lives in TRAILING_FIELDS' comment
+    // it (01/09/2026). The explanation lives in TRAILING_FIELDS' comment
     // now, where it costs the reader nothing.
     const field = document.querySelector('.config-field-trailing');
     expect(field).not.toBeNull();

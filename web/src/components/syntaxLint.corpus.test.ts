@@ -8,7 +8,7 @@
  *
  * This is the same test for the browser side. The corpus is `cell3d.html` from
  * `Machine_HMI_Demo` — the 1,559-line WebGL page that is the reason the Web Dev
- * two-shape model exists at all (Nigel, 03/09/2026). It is served to real
+ * two-shape model exists at all (03/09/2026). It is served to real
  * browsers and renders, so a mark anywhere in it is a defect in the checker.
  *
  * Opt-in, because the file is not in the repo: dump it and point

@@ -72,13 +72,13 @@ export default function WebDevTree({
 }: WebDevTreeProps) {
   // Sticky across an unmount — see useStickySet. This tree in particular was
   // called out for it: "everytime I go to that tab they return to being fully
-  // expanded regardless of what I set it to" (Nigel, 03/09/2026).
+  // expanded regardless of what I set it to" (03/09/2026).
   //
   // Tracked as EXPANDED, like the script and named-query trees, so the default
   // falls out of the empty set: this tree shipped tracking the COLLAPSED keys
   // instead, which made "nothing remembered yet" mean "everything open" — and
   // an eight-verb endpoint opens eight rows, so a project with six endpoints
-  // landed on fifty rows to scroll past (Nigel, 04/09/2026: "I want by default
+  // landed on fifty rows to scroll past (04/09/2026: "I want by default
   // the WebDev to start shrunk but remember what i've expanded between tabs").
   // The key is renamed with it, so a set stored by the old build is not read
   // back with its meaning inverted.

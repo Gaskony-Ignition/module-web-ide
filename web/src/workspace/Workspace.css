@@ -118,7 +118,7 @@
  * A COLUMN: editor on top, panel underneath, both between the side bars. The
  * 1.1.0 layout put the console beside the editor and split the width, which is
  * the wrong axis for something that prints lines — and is why the console moved
- * to the bottom in 1.3.0 (Nigel).
+ * to the bottom in 1.3.0.
  *
  * `min-height: 0` at every level of this chain is what lets the editor shrink
  * when the panel grows. Without it a flex child refuses to go below its content
@@ -207,7 +207,7 @@
  * Was its own bar under the settings strip in 1.4.0. Two chrome rows stacked
  * above the code cost the editor ~70px to say two short sentences that are
  * never both true at once, so it moved INTO the settings row as its leading
- * element (Nigel, 02/09/2026).
+ * element (02/09/2026).
  *
  * Warning-coloured on the left border, not error-coloured. An inherited script
  * is a normal, healthy state — most of a site project's library is inherited —
@@ -389,7 +389,7 @@
 
 /* ---- split editors (v1.9.0) -------------------------------------------
  *
- * Nigel, 03/09/2026: "I'm not seeing a way to split the screen between 2 or
+ * 03/09/2026: "I'm not seeing a way to split the screen between 2 or
  * more scripts so that I can do comparisons or copy and paste between."
  *
  * A ROW, unlike the editor/panel split above it: two buffers are compared side

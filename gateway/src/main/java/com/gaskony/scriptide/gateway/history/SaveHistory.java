@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  * <p>This module writes straight into a RUNNING gateway through
  * {@code ProjectManager.push}, and nothing anywhere keeps a history of that: not
  * the platform, which stores one current version of a resource; not this module,
- * which had none until 1.15.0; and not git, deliberately — Nigel's decision on
+ * which had none until 1.15.0; and not git, deliberately — a decision on
  * 01/09/2026 is that this is not becoming a git module. So until now the answer
  * to "I broke it ten minutes ago" was that there was no answer.</p>
  *

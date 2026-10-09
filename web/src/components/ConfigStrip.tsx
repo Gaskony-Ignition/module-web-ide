@@ -37,7 +37,7 @@ export interface ConfigStripProps {
   /**
    * Rendered first, on the same row as the controls.
    *
-   * The inheritance state goes here (Nigel, 02/09/2026). It used to be its own
+   * The inheritance state goes here (02/09/2026). It used to be its own
    * bar below this one, and two chrome rows stacked above the code cost the
    * editor ~70px for two short sentences that never appear at the same time as
    * each other. One row, notice on the left, settings on the right.
@@ -71,8 +71,8 @@ const LABELS: Record<string, string> = {
  *
  * `Script Hint Scope` is the only one, and its placement is the Designer's:
  * a small grey label and a combo at the top-right of the editor header, well
- * away from the code. It is a setting almost nobody touches — Nigel had used the
- * Designer for years without noticing it (01/09/2026) — and 1.4.0's first
+ * away from the code. It is a setting almost nobody touches — the Designer had been used
+ * for years without noticing it (01/09/2026) — and 1.4.0's first
  * attempt gave it a paragraph of explanation, which made the rarest control on
  * the strip the loudest thing on it.
  *

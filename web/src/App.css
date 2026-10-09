@@ -194,7 +194,7 @@
  *
  * Deliberately louder than the stale bar and deliberately not a notice: it is
  * the one failure where the user has unsaved work and no way to write it
- * (Nigel, 04/09/2026). It sits above the editor, uses the theme's error colour
+ * (04/09/2026). It sits above the editor, uses the theme's error colour
  * for its edge rather than its fill — a solid red band over code is hard to
  * read past — and stays until it is dismissed or the save succeeds.
  */

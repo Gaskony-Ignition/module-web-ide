@@ -25,8 +25,8 @@ import java.util.List;
  *
  * <h2>Why this exists at all</h2>
  *
- * <p>This is how every Docker UI opens a root terminal in one click, and Nigel
- * asked for that shape (02/09/2026) because a gateway installed directly on a
+ * <p>This is how every Docker UI opens a root terminal in one click, and that
+ * shape was asked for (02/09/2026) because a gateway installed directly on a
  * machine would just be given a real terminal — the browser terminal earns its
  * keep on a <b>containerised</b> gateway, which is exactly the case this
  * handles.</p>
@@ -84,7 +84,7 @@ public final class DockerExec {
      * Silence the login chatter before the interactive shell starts.
      *
      * <p>Every terminal opened on this rig began with
-     * {@code groups: cannot find name for group ID 984} (Nigel, 04/09/2026:
+     * {@code groups: cannot find name for group ID 984} (04/09/2026:
      * "suppress it"). The cause is exact: Debian's {@code /etc/bash.bashrc}
      * runs {@code $(groups)} to decide whether to print its "use sudo" hint,
      * and gid 984 is the HOST's docker group, added to this container by

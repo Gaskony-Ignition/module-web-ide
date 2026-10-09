@@ -4,7 +4,7 @@
  * The activity-bar views are a `? :` chain in `Workspace.tsx`, so switching from
  * Scripting to Web Dev does not hide the script tree — it REMOVES it. React
  * discards the component instance, `useState` goes with it, and every folder is
- * collapsed again when you come back (Nigel, 03/09/2026: "its annoying how
+ * collapsed again when you come back (03/09/2026: "its annoying how
  * everytime I shift between a section it resets to default").
  *
  * Two ways to fix that. Keep all three trees mounted and toggle `hidden`, which

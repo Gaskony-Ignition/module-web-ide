@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * The unknown-name check, tested from both ends.
  *
  * <p>Most of this file is about what must NOT be reported. That is the point:
- * the check exists because Nigel typed rubbish and nothing complained
+ * the check exists because someone typed rubbish and nothing complained
  * (04/09/2026), but a check that marks working code is worse than no check —
  * a reader who learns to ignore the marks ignores the real one too. So every
  * "finds it" case below has a "and does not find it here" case beside it, and
@@ -33,7 +33,7 @@ class UnknownNamesTest {
         @Test
         @DisplayName("the line that started this: four bare names, all of them rubbish")
         void catchesTheGarbageLine() {
-            // Nigel's own input, verbatim. Valid Python 2 — four semicolon-
+            // The original input, verbatim. Valid Python 2 — four semicolon-
             // separated expression statements — so the parser is happy and the
             // syntax check says nothing.
             assertThat(ModuleSymbols.parse("probe", "j;sdfj;asdfjk;dksfj").syntaxError())

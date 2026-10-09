@@ -71,7 +71,7 @@ describe('markOffset', () => {
 
 describe('geometryOffset', () => {
   it('divides by the PANE when the document does not fill it', () => {
-    // The 1.8.7 defect (Nigel, 04/09/2026: the mark "seems to just appear
+    // The 1.8.7 defect (04/09/2026: the mark "seems to just appear
     // randomly"). A 28-line script fills about 530px of an 819px pane, so
     // line-count arithmetic drew the last line's mark at the bottom of the
     // ruler while the code sat two thirds up. Dividing by the pane puts the
