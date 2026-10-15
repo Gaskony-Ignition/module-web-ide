@@ -84,6 +84,7 @@ import SearchPanel from '../components/SearchPanel';
 import ScriptConsole from '../components/ScriptConsole';
 import type { ActiveSource } from '../components/ScriptConsole';
 import QueryBrowser from '../components/QueryBrowser';
+import TagBrowser from '../components/TagBrowser';
 import StatusFooter from '../components/StatusFooter';
 import TabStrip from '../components/TabStrip';
 import { PresenceBar } from '../components/Presence';
@@ -3480,6 +3481,18 @@ export default function Workspace({ session }: WorkspaceProps) {
                       />
                     ) : (
                       <p className="terminal-notice">Starting a shell…</p>
+                    ),
+                  },
+                  {
+                    id: 'tags',
+                    label: 'Tags',
+                    content: (
+                      <TagBrowser
+                        csrfToken={session.csrfToken}
+                        isAdmin={session.writable}
+                        executionEnabled={session.executionEnabled !== false}
+                        visible={panelOpen && panelTab === 'tags'}
+                      />
                     ),
                   },
                   {

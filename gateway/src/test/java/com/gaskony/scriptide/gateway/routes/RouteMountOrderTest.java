@@ -136,6 +136,27 @@ class RouteMountOrderTest {
     }
 
     @Test
+    @DisplayName("every tag route is mounted, and all of them before the catch-all")
+    void tagRoutesAreMountedBeforeTheCatchAll() {
+        List<String> mounted = recordMountedPaths();
+        int catchAllIndex = mounted.indexOf(ScriptIdePaths.ROUTE_SPA_CATCH_ALL);
+
+        for (String route : List.of(
+            ScriptIdePaths.ROUTE_TAGS_PROVIDERS,
+            ScriptIdePaths.ROUTE_TAGS_BROWSE,
+            ScriptIdePaths.ROUTE_TAGS_READ,
+            ScriptIdePaths.ROUTE_TAGS_WRITE,
+            ScriptIdePaths.ROUTE_TAGS_CONFIG,
+            ScriptIdePaths.ROUTE_TAGS_CREATE,
+            ScriptIdePaths.ROUTE_TAGS_DELETE)) {
+            assertThat(mounted).as("%s was never mounted", route).contains(route);
+            assertThat(mounted.indexOf(route))
+                .as("%s is mounted after the catch-all and is therefore unreachable", route)
+                .isLessThan(catchAllIndex);
+        }
+    }
+
+    @Test
     @DisplayName("the content path is mounted three times — one per verb")
     void namedQueryContentCarriesThreeVerbs() {
         // GET, POST and DELETE share one path, and the registrar sets .method()

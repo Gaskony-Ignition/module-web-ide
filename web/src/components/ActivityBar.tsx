@@ -27,6 +27,7 @@
 import type { ReactNode } from 'react';
 import {
   IconAlert, IconDatabase, IconFiles, IconFlask, IconGlobe, IconPlay, IconSearch,
+  IconTag,
   IconTerminal,
 } from './Icons';
 import './ActivityBar.css';
@@ -35,7 +36,7 @@ import './ActivityBar.css';
 export type ViewId = 'scripts' | 'search' | 'webdev' | 'named-queries';
 
 /** Bottom-panel views. */
-export type PanelId = 'console' | 'query' | 'problems' | 'terminal' | 'tests';
+export type PanelId = 'console' | 'query' | 'problems' | 'terminal' | 'tests' | 'tags';
 
 export interface ActivityBarProps {
   /** The side-bar view, whether or not the side bar is showing. */
@@ -67,6 +68,8 @@ const PANELS: Array<{ id: PanelId; label: string; icon: ReactNode }> = [
   // Next to the console rather than in the side bar: a test result is OUTPUT,
   // read after asking for something, with the editor still on screen.
   { id: 'tests', label: 'Tests', icon: <IconFlask size={20} /> },
+  // Beside the query browser: the same "look at live gateway data" job, for tags.
+  { id: 'tags', label: 'Tags', icon: <IconTag size={19} /> },
 ];
 
 export default function ActivityBar({

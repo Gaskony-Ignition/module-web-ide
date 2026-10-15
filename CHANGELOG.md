@@ -2,6 +2,10 @@
 
 All notable changes to this module (Script IDE until 1.28.0). Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [1.30.7] — 2026-10-15
+
+- Tag Browser, in the bottom panel beside Query: a lazy tree of providers and folders with live value and quality (polled every 5 s for expanded folders only, and not at all while the tab is hidden), write, get configuration as JSON, create from configuration JSON with a collision policy, and delete with confirmation. Administrator only on every route; writes, creates and deletes need execution enabled and are audited.
+
 ## [1.29.1] — 2026-09-30
 
 - The Query Browser's table tree has a refresh button, and reloads itself after a run that returns an update count (`CREATE`, `ALTER`, `DROP`, …), so a table made in the browser shows straight away instead of after the gateway's five-minute schema cache.

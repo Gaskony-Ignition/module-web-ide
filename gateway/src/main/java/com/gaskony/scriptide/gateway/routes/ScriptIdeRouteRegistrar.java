@@ -42,6 +42,7 @@ public class ScriptIdeRouteRegistrar {
     private final NamedQueryRouteHandler namedQueryRouteHandler;
     private final NamedQueryTestRouteHandler namedQueryTestRouteHandler;
     private final DbQueryRouteHandler dbQueryRouteHandler;
+    private final TagRouteHandler tagRouteHandler;
     private final HistoryRouteHandler historyRouteHandler;
     private final PresenceRouteHandler presenceRouteHandler;
     private final GitStatusRouteHandler gitStatusRouteHandler;
@@ -97,6 +98,8 @@ public class ScriptIdeRouteRegistrar {
             com.gaskony.scriptide.gateway.ws.ScriptIdeSocketRegistry::getDbSchema,
             com.gaskony.scriptide.gateway.ws.ScriptIdeSocketRegistry::getExecAudit,
             com.gaskony.scriptide.gateway.ws.ScriptIdeSocketRegistry::getQueryHistory);
+        this.tagRouteHandler = new TagRouteHandler(context,
+            com.gaskony.scriptide.gateway.ws.ScriptIdeSocketRegistry::getExecAudit);
         // Same index created above, for the reason given there.
         this.testRouteHandler = new TestRouteHandler(index,
             com.gaskony.scriptide.gateway.ws.ScriptIdeSocketRegistry::getExecutionService,
@@ -330,6 +333,56 @@ public class ScriptIdeRouteRegistrar {
             .type(RouteGroup.TYPE_JSON)
             .accessControl(authed)
             .handler(dbQueryRouteHandler::history)
+            .mount();
+
+        // ==================== Tag Browser ====================
+        // Administrator on every route, reads included: a value and a tag's
+        // configuration are not names. See TagRouteHandler's class Javadoc.
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_PROVIDERS)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::providers)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_BROWSE)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::browse)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_CONFIG)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::config)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_READ)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::read)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_WRITE)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::write)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_CREATE)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::create)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_DELETE)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::delete)
             .mount();
 
         // ==================== Local history and runtime errors ====================

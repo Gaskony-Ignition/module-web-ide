@@ -328,6 +328,21 @@ public final class ScriptIdePaths {
      */
     public static final String ROUTE_DB_QUERY_HISTORY = "/api/db-queries/history";
 
+    /**
+     * The Tag Browser routes. All Administrator-gated: a value, a write and a
+     * configuration are more than the names the completion side serves. The
+     * mutating ones ({@code write}, {@code create}, {@code delete}) are POST,
+     * CSRF-checked and audited; {@code read} is POST only because a path list does
+     * not fit a query string.
+     */
+    public static final String ROUTE_TAGS_PROVIDERS = "/api/tags/providers";
+    public static final String ROUTE_TAGS_BROWSE = "/api/tags/browse";
+    public static final String ROUTE_TAGS_READ = "/api/tags/read";
+    public static final String ROUTE_TAGS_WRITE = "/api/tags/write";
+    public static final String ROUTE_TAGS_CONFIG = "/api/tags/config";
+    public static final String ROUTE_TAGS_CREATE = "/api/tags/create";
+    public static final String ROUTE_TAGS_DELETE = "/api/tags/delete";
+
     // ==================== Servlets (NOT under /data) ====================
 
     /**

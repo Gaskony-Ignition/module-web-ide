@@ -47,6 +47,11 @@ apart: an error never got far enough to have an opinion.*
 columns without leaving the query, and Copy as TSV pastes a result grid straight
 into a spreadsheet.*
 
+![The Tags tab: the default provider expanded to a folder of memory tags and a UDT instance, each atomic tag showing its value and quality inline, with the selected tag's value, a write box and its configuration JSON alongside](docs/images/tag-browser.png)
+*Live tags, read and written on the gateway itself. Values refresh only for open
+folders and only while the tab is showing; Get configuration exports a tag, folder
+or UDT as the same JSON that Create accepts.*
+
 ![The Ignition Gateway home page navigation with a Web IDE entry alongside the other installed modules](docs/images/gateway-nav.png)
 *It appears on the Gateway home page like any other module.*
 
@@ -60,6 +65,7 @@ into a spreadsheet.*
 | Navigation | Outline, go to definition (F12), quick open (Ctrl+P), project-wide search and replace, name-based find-references (Shift+F12), a Problems panel |
 | Web Dev | All eight HTTP methods per endpoint, per-method settings, create and delete, plus the endpoint's static HTML/JS/CSS files |
 | Database Query Browser | Pick a datasource, browse its schema-qualified tables and columns, and run ad hoc SQL with dialect-aware completion; sortable/filterable/resizable results with a cell viewer, Export CSV, auto-refresh, run-statement-under-cursor, and Save as Named Query; Stop on a long query, per-user history — Administrator only |
+| Tag Browser | Browse providers, folders, UDT definitions and instances with live value and quality; write a value, export a configuration as JSON, create from JSON (atomic, folder, UDT definition or instance) with a collision policy, delete with confirmation — Administrator only, writes audited |
 | Terminal | A real shell on a real pseudo-terminal on the gateway, gated separately from execution; root where the host already allows it, never more than the host allows |
 | History | Per-user save history including the pre-edit version; unsaved buffers recovered after a crash or closed tab; console run history kept across restarts |
 | Safety rails | A save that fails to parse asks once; a save that removes or renames a function lists its call sites first |

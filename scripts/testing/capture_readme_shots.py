@@ -211,6 +211,46 @@ def shot(page, name, cut_above=None, cut_below=0):
     print(f"  wrote {os.path.relpath(path, os.getcwd())}")
 
 
+TAG_FOLDER = "[default]WebIDE_Line1"
+TAG_UDT = "[default]_types_/WebIDE_Motor"
+
+
+def capture_tag_browser(page, csrf):
+    """A small line of memory tags and one UDT instance, made for the shot and
+    removed after it, so the picture shows every kind of node the tree draws."""
+    def tag(name, data_type, value):
+        return {"name": name, "tagType": "AtomicTag", "valueSource": "memory",
+                "dataType": data_type, "value": value}
+
+    for path in (TAG_FOLDER, TAG_UDT):
+        api(page, "POST", "api/tags/delete", csrf, {"paths": [path]})
+    api(page, "POST", "api/tags/create", csrf, {"basePath": "[default]_types_", "collision": "Overwrite",
+        "json": json.dumps({"name": "WebIDE_Motor", "tagType": "UdtType",
+                            "tags": [tag("Speed", "Float8", 1450.5), tag("Running", "Boolean", True)]})})
+    api(page, "POST", "api/tags/create", csrf, {"basePath": "[default]", "collision": "Overwrite",
+        "json": json.dumps({"name": "WebIDE_Line1", "tagType": "Folder", "tags": [
+            tag("Count", "Int4", 1287), tag("Mode", "String", "Auto"), tag("Rate", "Float8", 42.75),
+            {"name": "Motor1", "tagType": "UdtInstance", "typeId": "WebIDE_Motor"}]})})
+    try:
+        page.locator('.activity-item[aria-label="Tags"]').click()
+        page.wait_for_selector(".tb-toolbar", timeout=20000)
+        if page.locator('.panel-icon-button[aria-label="Maximise panel"]').count():
+            page.locator('.panel-icon-button[aria-label="Maximise panel"]').click()
+        page.get_by_role("button", name="Expand default", exact=True).click()
+        page.wait_for_timeout(1500)
+        page.get_by_role("button", name="Expand WebIDE_Line1", exact=True).click()
+        page.wait_for_timeout(1500)
+        page.get_by_role("button", name="Expand Motor1", exact=True).click()
+        page.wait_for_timeout(1500)
+        page.get_by_role("button", name="Count", exact=True).click()
+        page.get_by_role("button", name="Get configuration", exact=True).click()
+        page.wait_for_timeout(6000)  # one poll, so every value is drawn
+        shot(page, "tag-browser.png")
+    finally:
+        for path in (TAG_FOLDER, TAG_UDT):
+            api(page, "POST", "api/tags/delete", csrf, {"paths": [path]})
+
+
 with sync_playwright() as p:
     browser = p.chromium.launch()
     # The width the README's images have always been taken at. Changing it makes
@@ -354,6 +394,9 @@ with sync_playwright() as p:
     page.wait_for_selector(".qb-table", timeout=20000)
     page.wait_for_timeout(1000)
     shot(page, "query-browser.png")
+
+    # ---------- the Tag Browser ----------
+    capture_tag_browser(page, csrf)
 
     # ---------- clean up ----------
     page.reload(wait_until="load", timeout=30000)
