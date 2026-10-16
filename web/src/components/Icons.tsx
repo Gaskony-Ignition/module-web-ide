@@ -150,6 +150,37 @@ export const IconTag = (p: IconProps) =>
     p
   );
 
+/** Tag tree: a UDT instance — a solid box, one thing built from a definition. */
+export const IconUdtInstance = (p: IconProps) =>
+  svg(
+    <>
+      <path d="M8 1.8 13.6 4.6v6.8L8 14.2 2.4 11.4V4.6z" />
+      <path d="M2.4 4.6 8 7.4l5.6-2.8M8 7.4v6.8" />
+    </>,
+    p
+  );
+
+/** Tag tree: a UDT definition — the same box drawn as an outline with a ruled face. */
+export const IconUdtType = (p: IconProps) =>
+  svg(
+    <>
+      <path d="M8 1.8 13.6 4.6v6.8L8 14.2 2.4 11.4V4.6z" strokeDasharray="1.6 1.2" />
+      <path d="M5.2 7.6h5.6M8 7.6v4" />
+    </>,
+    p
+  );
+
+/** Tag tree: a tag provider — a stacked server. */
+export const IconTagProvider = (p: IconProps) =>
+  svg(
+    <>
+      <rect x="2" y="2.4" width="12" height="4.6" rx="1" />
+      <rect x="2" y="9" width="12" height="4.6" rx="1" />
+      <path d="M4.6 4.7h.01M4.6 11.3h.01" />
+    </>,
+    p
+  );
+
 /** Startup / shutdown / update — a lifecycle event. */
 export const IconPower = (p: IconProps) =>
   svg(

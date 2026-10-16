@@ -863,6 +863,12 @@ export default function QueryBrowser({
     });
     viewRef.current = view;
     return () => {
+      // The debounced column scan must not fire after unmount: closing the
+      // Query tab unmounts this component, and a late scan sets state on it.
+      if (lazyLoadTimerRef.current !== null) {
+        window.clearTimeout(lazyLoadTimerRef.current);
+        lazyLoadTimerRef.current = null;
+      }
       view.destroy();
       viewRef.current = null;
     };
@@ -1193,7 +1199,11 @@ export default function QueryBrowser({
           <div className="qb-editor" ref={hostRef} />
         </div>
 
-        <section className="qb-results" aria-label="Results">
+        <section
+          className={`qb-results${lastResult?.ok
+            && lastResult.results.filter(isDbQueryResultSet).length === 1 ? ' is-single' : ''}`}
+          aria-label="Results"
+        >
           {runError && <p className="qb-run-error" role="alert">{runError}</p>}
           {!runError && !lastResult && (
             <p className="qb-results-empty muted">Nothing yet. Run a query to see results here.</p>

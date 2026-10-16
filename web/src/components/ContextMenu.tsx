@@ -30,9 +30,11 @@ export interface ContextMenuProps {
   heading?: string;
   items: ContextMenuItem[];
   onClose: () => void;
+  /** Tighter rows, for a menu too long to fit a 640px-high window at the usual spacing. */
+  dense?: boolean;
 }
 
-export default function ContextMenu({ x, y, heading, items, onClose }: ContextMenuProps) {
+export default function ContextMenu({ x, y, heading, items, onClose, dense = false }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement | null>(null);
 
   // Escape and any click outside. `pointerdown` rather than `click`: a menu that
@@ -73,7 +75,7 @@ export default function ContextMenu({ x, y, heading, items, onClose }: ContextMe
 
   return (
     <div
-      className="context-menu"
+      className={dense ? 'context-menu is-dense' : 'context-menu'}
       role="menu"
       ref={ref}
       style={{ left: x, top: y }}

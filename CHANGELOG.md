@@ -2,6 +2,31 @@
 
 All notable changes to this module (Script IDE until 1.28.0). Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.0] — 2026-10-16
+
+Tags are now edited the way the Designer edits them, and the console and Query Browser get the whole editor area.
+
+- **Tag editor.**
+  - A Tags view in the left side bar lists providers, folders, UDT definitions (under Data Types) and UDT instances, with live value and quality inline.
+  - Right-click for New (memory, OPC, expression, query, reference and derived tags, folder, UDT definition, UDT instance), Rename, Duplicate, Copy, Cut, Paste, Delete, Copy Path, Export, Import and Write Value.
+  - Keyboard: F2, Delete, Ctrl+C/X/V and Ctrl+D. Multi-select with Ctrl and Shift.
+  - Drag a tag onto a folder to move it; hold Ctrl to copy.
+- **Tag tabs.**
+  - Clicking a tag opens it as an editor tab with a Properties form and a JSON tab.
+  - The form's sections follow the Designer: Basic, Value, Numeric, Metadata, Security, Scripting, Alarms, History, Parameters. The fields shown follow the tag's value source.
+  - Inherited values (UDT members) are shown in italic under a greyed label. Editing one overrides it, and Reset removes the override.
+  - There are editors for alarm lists, history settings, event scripts and UDT parameters.
+  - Ctrl+S saves. A tag changed on the gateway since it was opened raises the conflict dialog.
+- **Import and export.** JSON, or XML exactly as the Designer writes it. Designer 8.x XML imports with nesting, UDTs, alarms and parameters intact; pre-8 XML lands under the chosen folder.
+- **Script Console and Query** open as tabs in the editor area, in either split pane, and keep their state across tab switches. "New browser tab" is still on the tab strip. Problems, Terminal and Tests stay in the bottom panel.
+- The Outline hides when the active tab is not a script.
+- **Breaking:** the bottom-panel Tags tab from 1.30.7 is gone, replaced by the Tags view and tag tabs. The console and Query Browser are no longer bottom-panel tabs.
+- **Fixed:**
+  - A stray vertical scroll bar beside Split whenever a tab was open.
+  - The conflict dialog said "script" for every kind of tab.
+  - A single query result grid now uses the Query tab's full height instead of a 320px window.
+  - CSS, JavaScript, JSON and SQL syntax checks no longer report an error on valid code when the editor's background parse hasn't reached the end of the file (seen on a busy machine).
+
 ## [1.30.7] — 2026-10-15
 
 - Tag Browser, in the bottom panel beside Query: a lazy tree of providers and folders with live value and quality (polled every 5 s for expanded folders only, and not at all while the tab is hidden), write, get configuration as JSON, create from configuration JSON with a collision policy, and delete with confirmation. Administrator only on every route; writes, creates and deletes need execution enabled and are audited.

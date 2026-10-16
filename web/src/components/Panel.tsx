@@ -1,17 +1,18 @@
 /**
  * The bottom panel: VS Code's dock for things that are not the editor.
  *
- * Two tabs today, Script Console and Terminal, laid out the way VS Code lays out
- * its own — 11px uppercase labels along the top, actions for the ACTIVE tab
+ * Problems, Terminal and Tests, laid out the way VS Code lays out its own —
+ * 11px uppercase labels along the top, actions for the ACTIVE tab
  * right-aligned, then maximise and close. Both were floating panes before 1.3.0,
  * and a review note is the reason they are not any more: a console that opens
  * beside the editor competes with it for width, when the thing a console
  * actually needs is a wide, short strip under the code it is about.
  *
  * Every tab stays MOUNTED and is hidden with `hidden` rather than unmounted.
- * That is not an optimisation: a terminal's scrollback and a console's REPL
- * locals live in the component, and unmounting a tab to switch away from it
- * would silently discard a working session.
+ * That is not an optimisation: a terminal's scrollback lives in the component,
+ * and unmounting a tab to switch away from it would silently discard a working
+ * session. (The Script Console and Query, editor tabs since 16/10/2026, keep
+ * the same promise another way — see workspace/toolTabs.tsx.)
  */
 import type { ReactNode } from 'react';
 import { IconChevronDown, IconChevronUp, IconClose } from './Icons';

@@ -9,6 +9,7 @@
  * and `etag` together or not at all.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import {
   ApiError,
   createScript,
@@ -51,7 +52,7 @@ import ConflictDialog from '../components/ConflictDialog';
 import TestsPanel from '../components/TestsPanel';
 import ActivityBar, { type PanelId, type ViewId } from '../components/ActivityBar';
 import FileTree from '../components/FileTree';
-import { IconAlert, IconExternal, IconPlus } from '../components/Icons';
+import { IconAlert, IconPlus } from '../components/Icons';
 import LayoutControls, { type LayoutState } from '../components/LayoutControls';
 import Panel from '../components/Panel';
 import Resizer from '../components/Resizer';
@@ -84,7 +85,9 @@ import SearchPanel from '../components/SearchPanel';
 import ScriptConsole from '../components/ScriptConsole';
 import type { ActiveSource } from '../components/ScriptConsole';
 import QueryBrowser from '../components/QueryBrowser';
-import TagBrowser from '../components/TagBrowser';
+import TagTree, { type TagClipboard } from '../components/TagTree';
+import TagEditor from '../components/TagEditor';
+import { fetchTagEdit, saveTagConfig } from '../api/tags';
 import StatusFooter from '../components/StatusFooter';
 import TabStrip from '../components/TabStrip';
 import { PresenceBar } from '../components/Presence';
@@ -108,15 +111,27 @@ import {
   docUri,
   isDirty,
   isLockedByInheritance,
+  isProjectResourceDoc,
   isPythonDoc,
   isReadOnlyDoc,
   isStale,
   newDoc,
   newQueryDoc,
+  newTagDoc,
+  newToolDoc,
+  outlineVisible,
+  tagDocInfo,
   newUnsavedDoc,
+  prettyTagJson,
   settingsEqual,
+  tagDocUri,
+  tagLabel,
+  toolDocUri,
+  toolOf,
   type OpenDoc,
+  type ToolId,
 } from './documents';
+import { ToolPopOutButton, ToolSlot, useToolElement } from './toolTabs';
 import {
   entryForLocation,
   labelForLocation,
@@ -357,6 +372,14 @@ export default function Workspace({ session }: WorkspaceProps) {
     });
   }, []);
   const [savingAttrs, setSavingAttrs] = useState(false);
+  /**
+   * What the Tags view's Copy or Cut put aside. Held here, not in the tree:
+   * switching side-bar views unmounts the tree, and a paste after looking
+   * something up in Scripting must still have something to paste.
+   */
+  const [tagClipboard, setTagClipboard] = useState<TagClipboard | null>(null);
+  /** Bumped to make the Tags view re-browse — after a save, which can rename a tag. */
+  const [tagTreeNonce, setTagTreeNonce] = useState(0);
   const [notice, setNotice] = useState<Notice>(null);
   /**
    * Suggestions from the last "Organise imports" run, for the document that
@@ -389,13 +412,13 @@ export default function Workspace({ session }: WorkspaceProps) {
   /**
    * The bottom panel.
    *
-   * Console and Terminal live here rather than beside the editor
-   * (01/09/2026). A console needs to be wide and short — it prints lines — and
-   * putting it beside the code halves the width of both. `panelTab` survives the
-   * panel being closed so reopening returns to what you were using.
+   * Terminal, Tests and Problems live here. The Script Console and Query did
+   * too until 16/10/2026, when they were found "just too small to use" and
+   * became editor tabs. `panelTab` survives the panel being closed so
+   * reopening returns to what you were using.
    */
   const [panelOpen, setPanelOpen] = useState(false);
-  const [panelTab, setPanelTab] = useState<PanelId>('console');
+  const [panelTab, setPanelTab] = useState<PanelId>('problems');
   const [panelMaximised, setPanelMaximised] = useState(false);
   const [panelHeight, setPanelHeight] = useState(
     () => storedHeight('panel', defaultPanelHeight(window.innerHeight))
@@ -410,6 +433,9 @@ export default function Workspace({ session }: WorkspaceProps) {
   const [terminalStarted, setTerminalStarted] = useState(false);
   /** Bumped to restart the shell — see the Terminal tab's ✚ action. */
   const [terminalKey, setTerminalKey] = useState(0);
+  /** Where the Script Console and Query Browser render — see toolTabs.tsx. */
+  const consoleElement = useToolElement();
+  const queryElement = useToolElement();
   // The side bar collapses to the activity strip, VS Code style. Its width and
   // the outline's are remembered per viewer; a pane you have to re-drag every
   // visit is worse than one that is not resizable.
@@ -491,7 +517,10 @@ export default function Workspace({ session }: WorkspaceProps) {
    * Designer, which has no concept of our data keys, can possibly report.
    */
   useEffect(() => {
-    const open = [...new Set(docs.map((doc) => doc.path))];
+    // Tags and tool tabs are not project resources: neither the Designer nor
+    // another browser reports presence on one, so announcing them would only be
+    // noise.
+    const open = [...new Set(docs.filter(isProjectResourceDoc).map((doc) => doc.path))];
     presenceClient().report(project, open);
   }, [docs, project]);
 
@@ -499,6 +528,7 @@ export default function Workspace({ session }: WorkspaceProps) {
   const presenceByUri = useMemo(() => {
     const map = new Map<string, Peer[]>();
     for (const doc of docs) {
+      if (!isProjectResourceDoc(doc)) continue;
       const others = peersOn(presence, doc.project, doc.path);
       if (others.length > 0) {
         map.set(doc.uri, others);
@@ -539,7 +569,7 @@ export default function Workspace({ session }: WorkspaceProps) {
 
   /** Peers on the document actually on screen, for the bar above it. */
   const activePresence = useMemo(
-    () => (activeDoc ? peersOn(presence, activeDoc.project, activeDoc.path) : []),
+    () => (activeDoc && isProjectResourceDoc(activeDoc) ? peersOn(presence, activeDoc.project, activeDoc.path) : []),
     [activeDoc, presence]
   );
 
@@ -638,6 +668,10 @@ export default function Workspace({ session }: WorkspaceProps) {
       // fails or 409s takes its uri out of the set and the bar returns, which is
       // the one case where it is telling the truth.
       if (savingUris.has(doc.uri)) continue;
+      // No listing carries a tag's signature; a tag edited elsewhere is caught
+      // by the save's signature check and the conflict dialog instead. A tool
+      // tab has no gateway copy at all.
+      if (!isProjectResourceDoc(doc)) continue;
       if (isStale(doc, signatures.get(docUri(doc.project, doc.path)))) out.add(doc.uri);
     }
     return out;
@@ -674,6 +708,12 @@ export default function Workspace({ session }: WorkspaceProps) {
       ? `Project "${tree.project}" is not mutable on this gateway, so the editor is read-only.`
       : '';
   const readOnly = readOnlyReason.length > 0;
+  /**
+   * Tags have their own gate. They are not project resources, so an immutable
+   * PROJECT has no bearing on them; the tag routes need the Administrator role
+   * and gateway-wide execution, the same pair the Query Browser checks.
+   */
+  const tagsWritable = session.writable && session.executionEnabled !== false;
 
   /**
    * The active tab is read-only on its OWN account: inherited, not overridden.
@@ -690,23 +730,37 @@ export default function Workspace({ session }: WorkspaceProps) {
    * project qualify — a script from another project would execute against the
    * wrong library.
    */
+  /**
+   * The script last worked in, for "Run file" while the console's own tab is
+   * the active one — which, now the console is a tab, is whenever its button is
+   * pressed. Without this the button would only work with the console in the
+   * other pane.
+   */
+  const [lastScriptUri, setLastScriptUri] = useState<string | null>(null);
+  useEffect(() => {
+    if (activeDoc?.kind === 'script') setLastScriptUri(activeDoc.uri);
+  }, [activeDoc?.kind, activeDoc?.uri]);
+
   const activeSource = useMemo<ActiveSource | undefined>(() => {
+    const sourceDoc = activeDoc && toolOf(activeDoc)
+      ? docs.find((d) => d.uri === lastScriptUri) ?? null
+      : activeDoc;
     // Python only. "Run file" hands the buffer to the Jython interpreter, so a
     // named query would arrive as SQL and a Web Dev text resource as HTML.
     // Testing a query is its own tab, against the database; a static file is
     // tested by requesting the endpoint.
-    if (!activeDoc || !isPythonDoc(activeDoc) || activeDoc.project !== project) {
+    if (!sourceDoc || !isPythonDoc(sourceDoc) || sourceDoc.project !== project) {
       return undefined;
     }
-    const uri = activeDoc.uri;
+    const uri = sourceDoc.uri;
     return {
-      path: activeDoc.path,
-      label: activeDoc.label,
+      path: sourceDoc.path,
+      label: sourceDoc.label,
       getSource: () => docsRef.current.find((d) => d.uri === uri)?.text ?? '',
     };
-  }, [activeDoc, project]);
-  /** Writes are refused for either reason. */
-  const activeWritable = !readOnly && !activeLocked;
+  }, [activeDoc, docs, lastScriptUri, project]);
+  /** Writes are refused for either reason — or, for a tag, by the tag gate alone. */
+  const activeWritable = activeDoc?.kind === 'tag' ? tagsWritable : !readOnly && !activeLocked;
 
   useEffect(() => {
     let cancelled = false;
@@ -1006,6 +1060,28 @@ export default function Workspace({ session }: WorkspaceProps) {
     [project]
   );
 
+  /** Open a tag in a tab, from the Tags view. */
+  const openTag = useCallback(
+    async (path: string) => {
+      const uri = tagDocUri(path);
+      if (docsRef.current.some((d) => d.uri === uri)) {
+        selectDoc(uri);
+        return;
+      }
+      try {
+        const info = await fetchTagEdit(path);
+        setDocs((current) =>
+          current.some((d) => d.uri === uri) ? current : [...current, newTagDoc({ path, ...info })]
+        );
+        selectDoc(uri);
+        setNotice(null);
+      } catch (e: unknown) {
+        setNotice({ kind: 'error', text: `Could not open ${path}: ${describe(e)}` });
+      }
+    },
+    [selectDoc]
+  );
+
 
   // ---- export / import ---------------------------------------------------
 
@@ -1139,6 +1215,8 @@ export default function Workspace({ session }: WorkspaceProps) {
     () => docs.filter((d) => splitUris.has(d.uri)),
     [docs, splitUris]
   );
+  const leftEditorDocs = useMemo(() => leftDocs.filter(isProjectResourceDoc), [leftDocs]);
+  const rightEditorDocs = useMemo(() => rightDocs.filter(isProjectResourceDoc), [rightDocs]);
 
   const { left: leftActive, right: rightActive } = paneActives(
     { activeUri, otherActive, split: splitUris },
@@ -1231,6 +1309,81 @@ export default function Workspace({ session }: WorkspaceProps) {
   }, [forceCloseDoc]);
 
   /**
+   * Tabs follow a tag the Tags view renamed or moved — the tag and anything
+   * under a moved folder.
+   *
+   * Re-keyed in place rather than closed and reopened, so an unsaved edit is
+   * not lost to a rename. A clean tab re-reads (its signature moved with the
+   * path); a dirty one keeps its buffer, with its own `name` brought along so a
+   * save does not write the old name back, and the next save's signature check
+   * decides the rest through the conflict dialog.
+   */
+  const retargetTagDocs = useCallback((moves: Array<{ from: string; to: string }>) => {
+    const destination = (path: string): string | null => {
+      for (const { from, to } of moves) {
+        if (path === from) return to;
+        if (path.startsWith(`${from}/`)) return to + path.slice(from.length);
+      }
+      return null;
+    };
+    const renamed = new Map<string, string>();
+    const next = docsRef.current.map((d) => {
+      const to = d.kind === 'tag' ? destination(d.path) : null;
+      if (!to) return d;
+      const uri = tagDocUri(to);
+      renamed.set(d.uri, uri);
+      let text = d.text;
+      const oldName = tagLabel(d.path);
+      const newName = tagLabel(to);
+      if (isDirty(d) && oldName !== newName) {
+        try {
+          const parsed = JSON.parse(text) as Record<string, unknown>;
+          if (parsed && parsed.name === oldName) text = JSON.stringify({ ...parsed, name: newName }, null, 2);
+        } catch {
+          /* not JSON: leave the buffer exactly as typed */
+        }
+      }
+      return { ...d, uri, path: to, label: newName, text };
+    });
+    if (renamed.size === 0) return;
+    docsRef.current = next;
+    setDocs(next);
+    const panes = paneStateRef.current;
+    const map = (uri: string | null) => (uri ? renamed.get(uri) ?? uri : uri);
+    applyPanes({
+      activeUri: map(panes.activeUri),
+      otherActive: map(panes.otherActive),
+      split: new Set([...panes.split].map((uri) => renamed.get(uri) ?? uri)),
+    });
+    for (const doc of next) {
+      if (![...renamed.values()].includes(doc.uri) || isDirty(doc)) continue;
+      void fetchTagEdit(doc.path)
+        .then((info) => setDocs((all) => all.map((d) => (d.uri === doc.uri && !isDirty(d)
+          ? newTagDoc({ path: doc.path, ...info })
+          : d))))
+        .catch(() => { /* the tab still shows the right text; the next save re-checks */ });
+    }
+  }, [applyPanes]);
+
+  /**
+   * Close every tab on tags the Tags view deleted, and on anything under them.
+   *
+   * Without asking: the delete confirmation already said open editors close,
+   * and a "save before closing?" here would offer to write a tag that has just
+   * been removed straight back.
+   */
+  const closeTagDocs = useCallback((paths: string[]) => {
+    const doomed = docsRef.current.filter((d) => d.kind === 'tag'
+      && paths.some((path) => d.path === path || d.path.startsWith(`${path}/`)));
+    for (const doc of doomed) {
+      forceCloseDoc(doc.uri);
+      // forceCloseDoc reads the ref, and the render that refreshes it has not
+      // happened yet — without this the next close would bring this one back.
+      docsRef.current = docsRef.current.filter((d) => d.uri !== doc.uri);
+    }
+  }, [forceCloseDoc]);
+
+  /**
    * Apply a successful write: base text, base settings and signature move
    * together.
    *
@@ -1283,6 +1436,16 @@ export default function Workspace({ session }: WorkspaceProps) {
     /** The settings half, for a named query. Absent for a script. */
     query?: Partial<OpenDoc>;
   }> => {
+    if (doc.kind === 'tag') {
+      // `query` is the generic "rest of the document" every pull spreads in;
+      // for a tag it is the resolved config the property form reads.
+      const current = await fetchTagEdit(doc.path);
+      return {
+        text: prettyTagJson(current.local),
+        etag: current.signature,
+        query: { tag: tagDocInfo(current) },
+      };
+    }
     if (doc.kind === 'named-query') {
       // BOTH halves, as `openQuery` does. Until 1.12.0 this read only the SQL,
       // so pulling a query that had changed on the gateway replaced its buffer
@@ -1459,6 +1622,59 @@ export default function Workspace({ session }: WorkspaceProps) {
   }, [readCurrent, staleUris]);
 
   /**
+   * Write a tag's own configuration, against the signature it was opened at.
+   *
+   * Its own path rather than a branch inside the script save: none of that
+   * path's checks (parse via the language server, call-site impact, project
+   * mutability) mean anything for JSON in a tag provider. A buffer that is not
+   * JSON is refused here rather than sent, and a stale signature comes back as
+   * the ordinary conflict dialog.
+   */
+  const saveTagDoc = useCallback(
+    async (doc: OpenDoc, baseSignature?: string) => {
+      if (!tagsWritable) return;
+      const source = doc.text;
+      try {
+        JSON.parse(source);
+      } catch (e: unknown) {
+        setNotice({ kind: 'error', text: `${doc.label} is not valid JSON, so it was not saved: ${describe(e)}` });
+        return;
+      }
+      setSaving(true);
+      beginSaving(doc.uri);
+      setNotice(null);
+      try {
+        const result = await saveTagConfig(doc.path, source, baseSignature ?? doc.etag, session.csrfToken);
+        if (!result.ok) {
+          setNotice({ kind: 'error', text: `The gateway refused ${doc.label}: ${result.results.join(', ')}` });
+          return;
+        }
+        commitSaved(doc.uri, source, result.signature);
+        setConflict(null);
+        setNotice({ kind: 'info', text: `Saved ${doc.label}.` });
+        setTagTreeNonce((n) => n + 1);
+        // The resolved config moves with an override; the buffer and signature
+        // are already what the gateway agreed to, so only that half is re-read.
+        // Awaited: "Save and close" decides from the document ref once this
+        // returns, and the ref only catches up with commitSaved on a render.
+        await fetchTagEdit(doc.path)
+          .then((info) => setDocs((all) => all.map((d) => (d.uri === doc.uri
+            ? { ...d, tag: tagDocInfo(info) }
+            : d))))
+          .catch(() => { /* cosmetic: the save itself landed */ });
+      } catch (e: unknown) {
+        if (e instanceof ApiError && e.isUnauthenticated) setSignedOut(doc.label);
+        else if (e instanceof ApiError && e.isConflict) await raiseConflict(doc);
+        else setNotice({ kind: 'error', text: `Could not save ${doc.label}: ${describe(e)}` });
+      } finally {
+        setSaving(false);
+        endSaving(doc.uri);
+      }
+    },
+    [beginSaving, commitSaved, endSaving, raiseConflict, session.csrfToken, tagsWritable]
+  );
+
+  /**
    * Write a named query: SQL first, then settings against the signature that
    * write returned.
    *
@@ -1513,6 +1729,14 @@ export default function Workspace({ session }: WorkspaceProps) {
   const saveDoc = useCallback(
     async (uri: string, baseSignature?: string, force = false) => {
       const doc = docsRef.current.find((d) => d.uri === uri);
+      // A tool tab has nothing to save; without this a Ctrl+S or a stray
+      // "Save" would reach the script write path with an empty path.
+      if (doc && toolOf(doc)) return;
+      // Before the project gate below: a tag is not in any project.
+      if (doc?.kind === 'tag') {
+        await saveTagDoc(doc, baseSignature);
+        return;
+      }
       // Locked as well as read-only: without this, Ctrl+S on an inherited tab
       // would fork the parent's script even though the buffer refused to be
       // typed into — the keybinding does not go through the disabled button.
@@ -1636,7 +1860,7 @@ export default function Workspace({ session }: WorkspaceProps) {
       }
     },
     [beginSaving, commitSaved, endSaving, lsp, project, raiseConflict, readOnly,
-      saveQueryDoc, session.csrfToken]
+      saveQueryDoc, saveTagDoc, session.csrfToken]
   );
 
   /**
@@ -1834,6 +2058,8 @@ export default function Workspace({ session }: WorkspaceProps) {
   const activeAttrs = activeUri ? attrs[activeUri] : undefined;
   /** The active tab when it holds a named query; null for a script or none. */
   const activeQueryDoc = activeDoc?.kind === 'named-query' ? activeDoc : null;
+  /** The active tab when it holds a tag. */
+  const activeTagDoc = activeDoc?.kind === 'tag' ? activeDoc : null;
   /**
    * Documents the language server actually holds.
    *
@@ -2551,8 +2777,13 @@ export default function Workspace({ session }: WorkspaceProps) {
   const layout: LayoutState = {
     sideBar: railOpen,
     panel: panelOpen,
-    secondary: outlineOpen,
+    secondary: outlineVisible(outlineOpen, activeDoc),
   };
+  // The stored preference (outlineOpen) is untouched; only the toggle's view of it changes.
+  const secondaryUnavailable =
+    activeDoc !== null && activeDoc.kind !== 'script'
+      ? 'the outline only shows for scripts'
+      : undefined;
 
   const toggleRegion = useCallback((region: keyof LayoutState) => {
     if (region === 'sideBar') setRailOpen((open) => !open);
@@ -2576,6 +2807,24 @@ export default function Workspace({ session }: WorkspaceProps) {
     rememberWidth('panel', panel);
   }, []);
 
+  /**
+   * Open a tool's tab, or bring it forward if it is already open.
+   *
+   * A singleton: one console and one Query Browser per workspace, each with
+   * its state in one mounted component (see toolTabs.tsx). A new tab lands in
+   * the left pane like any other document opened from the side; Split moves it.
+   */
+  const openTool = useCallback((tool: ToolId) => {
+    const uri = toolDocUri(tool);
+    if (!docsRef.current.some((d) => d.uri === uri)) {
+      const next = [...docsRef.current, newToolDoc(tool)];
+      // Through the ref as well, so a select in the same tick sees the tab.
+      docsRef.current = next;
+      setDocs(next);
+    }
+    selectDoc(uri);
+  }, [selectDoc]);
+
   /** Open the console in its own browser tab, on the current project. */
   const popOutConsole = useCallback(() => {
     const url = `${window.location.pathname}?view=console&project=${encodeURIComponent(project)}`;
@@ -2588,7 +2837,7 @@ export default function Workspace({ session }: WorkspaceProps) {
       }
       // Popped out means popped out — leaving a second console in this tab
       // would give two REPLs that look alike and do not share locals.
-      setPanelOpen(false);
+      forceCloseDoc(toolDocUri('console'));
     } else {
       setNotice({
         kind: 'error',
@@ -2596,7 +2845,7 @@ export default function Workspace({ session }: WorkspaceProps) {
           + 'or keep using the console in this tab.',
       });
     }
-  }, [project]);
+  }, [forceCloseDoc, project]);
 
   /** Open the Query Browser in its own browser tab, on the current project. */
   const popOutQuery = useCallback(() => {
@@ -2608,7 +2857,7 @@ export default function Workspace({ session }: WorkspaceProps) {
       } catch {
         /* same-origin, so this is hygiene rather than an exposure */
       }
-      setPanelOpen(false);
+      forceCloseDoc(toolDocUri('query'));
     } else {
       setNotice({
         kind: 'error',
@@ -2616,7 +2865,7 @@ export default function Workspace({ session }: WorkspaceProps) {
           + 'or keep using the Query Browser in this tab.',
       });
     }
-  }, [project]);
+  }, [forceCloseDoc, project]);
 
   /**
    * Open a DRAFT for a gateway-event singleton that does not exist yet.
@@ -2655,6 +2904,63 @@ export default function Workspace({ session }: WorkspaceProps) {
     const doc = uri ? docs.find((d) => d.uri === uri) : null;
     return doc && doc.kind === 'named-query' ? doc : null;
   }
+
+  /** The open tag in one pane, or null. */
+  function tagDocIn(uri: string | null) {
+    const doc = uri ? docs.find((d) => d.uri === uri) : null;
+    return doc && doc.kind === 'tag' ? doc : null;
+  }
+
+  /**
+   * A pane's tag editor, for the tag that pane is showing.
+   *
+   * Per PANE rather than in the focused-pane chrome: a tag has no CodeMirror
+   * buffer underneath to fall back on, so a tag parked in the unfocused pane
+   * would otherwise show nothing at all. Keyed on the document so each tag gets
+   * its own editor state.
+   */
+  function tagEditorFor(uri: string | null) {
+    const doc = tagDocIn(uri);
+    if (!doc) return null;
+    return (
+      <TagEditor
+        key={doc.uri}
+        doc={doc}
+        onChange={(text) => handleChange(doc.uri, text)}
+        onSave={() => void saveDoc(doc.uri)}
+        onReload={() => void pullDoc(doc.uri)}
+        saving={saving && savingUris.has(doc.uri)}
+        dirty={isDirty(doc)}
+        readOnly={!tagsWritable}
+        csrfToken={session.csrfToken}
+      />
+    );
+  }
+
+  /** The tool a pane is showing, or null. */
+  function toolIn(uri: string | null): ToolId | null {
+    return toolOf(uri ? docs.find((d) => d.uri === uri) : null);
+  }
+
+  /** Where a pane shows its tool tab — see toolTabs.tsx. */
+  function toolSlotFor(uri: string | null) {
+    const tool = toolIn(uri);
+    if (!tool) return null;
+    return <ToolSlot key={tool} element={tool === 'console' ? consoleElement : queryElement} />;
+  }
+
+  /** The pop-out action for the tool a pane is showing. */
+  function toolActionsFor(uri: string | null) {
+    const tool = toolIn(uri);
+    if (tool === 'console') return <ToolPopOutButton label="console" onClick={popOutConsole} />;
+    if (tool === 'query') return <ToolPopOutButton label="Query Browser" onClick={popOutQuery} />;
+    return null;
+  }
+
+  const activeTool = toolOf(activeDoc);
+  const consoleOpen = docs.some((d) => d.uri === toolDocUri('console'));
+  const queryOpen = docs.some((d) => d.uri === toolDocUri('query'));
+  const showOutline = outlineVisible(outlineOpen, activeDoc);
 
   /**
    * Everything above the buffer that describes the FOCUSED document.
@@ -2943,7 +3249,7 @@ export default function Workspace({ session }: WorkspaceProps) {
         />
       )}
 
-      {parentDiffOpen && activeDoc && !activeQueryDoc && (
+      {parentDiffOpen && activeDoc && activeDoc.kind === 'script' && (
         <ParentDiffDialog
           project={activeDoc.project}
           path={activeDoc.path}
@@ -2954,7 +3260,7 @@ export default function Workspace({ session }: WorkspaceProps) {
         />
       )}
 
-      {historyOpen && activeDoc && !activeQueryDoc && (
+      {historyOpen && activeDoc && activeDoc.kind === 'script' && (
         <HistoryDialog
           project={activeDoc.project}
           path={activeDoc.path}
@@ -2984,20 +3290,23 @@ export default function Workspace({ session }: WorkspaceProps) {
           </select>
         </label>
 
-        <button
-          type="button"
-          className="button"
-          onClick={() => activeUri && void saveDoc(activeUri)}
-          disabled={!activeDoc || !activeWritable || saving || !isDirty(activeDoc)}
-        >
-          {saving ? 'Saving…' : activeQueryDoc ? 'Save query' : 'Save script'}
-        </button>
+        {/* Absent on a tool tab: there is nothing there to save. */}
+        {!activeTool && (
+          <button
+            type="button"
+            className="button"
+            onClick={() => activeUri && void saveDoc(activeUri)}
+            disabled={!activeDoc || !activeWritable || saving || !isDirty(activeDoc)}
+          >
+            {saving ? 'Saving…' : activeQueryDoc ? 'Save query' : activeTagDoc ? 'Save tag' : 'Save script'}
+          </button>
+        )}
 
         {/* Only for a script document. A named query is two halves against one
             signature and the history store keeps one body per document, so
             offering it there would restore the SQL and silently leave the
             settings — the same lost-update shape validate_v17_nq found. */}
-        {activeDoc && !activeQueryDoc && (
+        {activeDoc && activeDoc.kind === 'script' && (
           <button
             type="button"
             className="button"
@@ -3025,7 +3334,7 @@ export default function Workspace({ session }: WorkspaceProps) {
         {/* Only where there is something to compare against. `override` means
             this project owns a copy of a resource a parent also has; anything
             else has no parent copy and the dialog would only ever say so. */}
-        {activeDoc && !activeQueryDoc && activeDoc.origin === 'override' && (
+        {activeDoc && activeDoc.kind === 'script' && activeDoc.origin === 'override' && (
           <button
             type="button"
             className="button"
@@ -3081,7 +3390,12 @@ export default function Workspace({ session }: WorkspaceProps) {
         {/* The four VS Code layout glyphs replace the 1.2.0 "Console" and
             "Outline" text buttons: one control set for all three regions,
             in the place a VS Code user already looks for them. */}
-        <LayoutControls layout={layout} onToggle={toggleRegion} onReset={resetLayout} />
+        <LayoutControls
+          layout={layout}
+          onToggle={toggleRegion}
+          onReset={resetLayout}
+          secondaryUnavailable={secondaryUnavailable}
+        />
       </div>
 
       <div className="workspace-body">
@@ -3091,6 +3405,8 @@ export default function Workspace({ session }: WorkspaceProps) {
           onSelect={selectView}
           activePanel={panelOpen ? panelTab : null}
           onSelectPanel={selectPanel}
+          activeTool={activeTool}
+          onSelectTool={openTool}
         />
 
         {/* The rail is a column, not just the tree: the tree scrolls inside it
@@ -3100,7 +3416,21 @@ export default function Workspace({ session }: WorkspaceProps) {
           <>
             <div className="workspace-rail" style={{ width: railWidth, flex: `0 0 ${railWidth}px` }}>
               <div className="rail-title">{RAIL_TITLES[view]}</div>
-              {view === 'named-queries' ? (
+              {view === 'tags' ? (
+                <TagTree
+                  csrfToken={session.csrfToken}
+                  isAdmin={session.writable}
+                  executionEnabled={session.executionEnabled !== false}
+                  activePath={activeTagDoc?.path ?? null}
+                  clipboard={tagClipboard}
+                  onClipboard={setTagClipboard}
+                  onOpen={(path) => void openTag(path)}
+                  onMoved={retargetTagDocs}
+                  onDeleted={closeTagDocs}
+                  onNotice={(kind, text) => setNotice({ kind, text })}
+                  refreshKey={tagTreeNonce}
+                />
+              ) : view === 'named-queries' ? (
                 queries ? (
                   <NamedQueryTree
                     queries={queries.queries}
@@ -3262,15 +3592,20 @@ export default function Workspace({ session }: WorkspaceProps) {
                     ? 'Move this document to the right-hand editor'
                     : 'Open this document in a second editor beside this one'}
                   splitText={splitUris.size > 0 ? 'Move right' : 'Split'}
+                  actions={toolActionsFor(leftActive)}
                 />
                 {!focusedPaneIsRight && paneChrome}
+                {tagEditorFor(leftActive)}
+                {toolSlotFor(leftActive)}
                 {docs.length === 0 && (
                   <p className="code-editor-empty">
-                    Choose a script or a named query on the left to start editing.
+                    Choose a script, a named query or a tag on the left to start editing.
                   </p>
                 )}
                 <CodeEditor
-                  docs={leftDocs}
+                  // Never a tag: CodeEditor builds a Jython view, language
+                  // server and all, for every document it is handed.
+                  docs={leftEditorDocs}
                   activeUri={leftActive}
                   readOnly={readOnly}
                   onChange={handleChange}
@@ -3287,7 +3622,8 @@ export default function Workspace({ session }: WorkspaceProps) {
                   // tab has the area: unmounting would destroy every open
                   // document's view along with its undo history. Per PANE, so a
                   // query's Settings tab does not blank the script beside it.
-                  hidden={queryDocIn(leftActive) ? !showsBuffer(queryTab) : false}
+                  hidden={tagDocIn(leftActive) !== null || toolIn(leftActive) !== null
+                    || (queryDocIn(leftActive) ? !showsBuffer(queryTab) : false)}
                 />
               </div>
 
@@ -3320,10 +3656,13 @@ export default function Workspace({ session }: WorkspaceProps) {
                     onSplit={moveToOtherPane}
                     splitLabel="Move this document back to the left-hand editor"
                     splitText="Move left"
+                    actions={toolActionsFor(rightActive)}
                   />
                   {focusedPaneIsRight && paneChrome}
+                  {tagEditorFor(rightActive)}
+                  {toolSlotFor(rightActive)}
                   <CodeEditor
-                    docs={rightDocs}
+                    docs={rightEditorDocs}
                     activeUri={rightActive}
                     readOnly={readOnly}
                     onChange={handleChange}
@@ -3333,7 +3672,8 @@ export default function Workspace({ session }: WorkspaceProps) {
                       jumpToLine(line, character);
                       showPanel('problems');
                     }}
-                    hidden={queryDocIn(rightActive) ? !showsBuffer(queryTab) : false}
+                    hidden={tagDocIn(rightActive) !== null || toolIn(rightActive) !== null
+                      || (queryDocIn(rightActive) ? !showsBuffer(queryTab) : false)}
                   />
                 </div>
               )}
@@ -3388,72 +3728,6 @@ export default function Workspace({ session }: WorkspaceProps) {
                     ),
                   },
                   {
-                    id: 'console',
-                    label: 'Script Console',
-                    actions: (
-                      <button
-                        type="button"
-                        className="panel-icon-button"
-                        onClick={popOutConsole}
-                        aria-label="Open the console in a new browser tab"
-                        title="Open in a new browser tab"
-                      >
-                        <IconExternal size={14} />
-                      </button>
-                    ),
-                    content: (
-                      /* NOT keyed on the project (unlike QueryBrowser below): the
-                         console owns its own project picker (1.29.0), so a switch
-                         of the IDE's own project must not remount it — that would
-                         drop the picker's choice and the buffer along with it.
-                         `project` only ever seeds the picker's initial default. */
-                      <ScriptConsole
-                        project={project}
-                        csrfToken={session.csrfToken}
-                        canExecute={session.canExecute !== false && !readOnly}
-                        activeSource={activeSource}
-                        onOpenFrame={(path, line) => {
-                          const entry = tree?.scripts.find((c) => c.path === path);
-                          if (entry) {
-                            void openScript(entry).then(() => jumpToLine(line - 1, 0));
-                          }
-                        }}
-                      />
-                    ),
-                  },
-                  {
-                    id: 'query',
-                    label: 'Query',
-                    actions: (
-                      <button
-                        type="button"
-                        className="panel-icon-button"
-                        onClick={popOutQuery}
-                        aria-label="Open the Query Browser in a new browser tab"
-                        title="Open in a new browser tab"
-                      >
-                        <IconExternal size={14} />
-                      </button>
-                    ),
-                    content: (
-                      /* Keyed on the project, like the console: the remembered
-                         datasource and buffer are per viewer, not per project,
-                         but a fresh mount on switching projects still avoids a
-                         run in flight outliving the project it was sent to. */
-                      <QueryBrowser
-                        key={project}
-                        project={project}
-                        csrfToken={session.csrfToken}
-                        // Role only, not `readOnly` — that flag also covers an
-                        // immutable PROJECT, which has no bearing on running raw
-                        // SQL against a datasource; folding it in here would
-                        // attribute a denial to the wrong reason.
-                        isAdmin={session.writable}
-                        executionEnabled={session.executionEnabled !== false}
-                      />
-                    ),
-                  },
-                  {
                     id: 'terminal',
                     label: 'Terminal',
                     actions: (
@@ -3481,18 +3755,6 @@ export default function Workspace({ session }: WorkspaceProps) {
                       />
                     ) : (
                       <p className="terminal-notice">Starting a shell…</p>
-                    ),
-                  },
-                  {
-                    id: 'tags',
-                    label: 'Tags',
-                    content: (
-                      <TagBrowser
-                        csrfToken={session.csrfToken}
-                        isAdmin={session.writable}
-                        executionEnabled={session.executionEnabled !== false}
-                        visible={panelOpen && panelTab === 'tags'}
-                      />
                     ),
                   },
                   {
@@ -3527,7 +3789,7 @@ export default function Workspace({ session }: WorkspaceProps) {
           )}
         </div>
 
-        {outlineOpen && (
+        {showOutline && (
           <>
             <Resizer
               value={outlineWidth}
@@ -3544,7 +3806,7 @@ export default function Workspace({ session }: WorkspaceProps) {
               // Null for a named query: the outline is the Jython symbol table
               // and SQL has none. An outline that stayed on the last script
               // would describe a file nobody is looking at.
-              uri={activeUri && !activeQueryDoc
+              uri={activeUri && activeDoc?.kind === 'script'
                 ? lspUri(activeDoc?.project ?? project, activeDoc?.path ?? '', activeDoc?.scriptKey)
                 : null}
               revision={docRevision}
@@ -3556,6 +3818,46 @@ export default function Workspace({ session }: WorkspaceProps) {
           </>
         )}
       </div>
+
+      {/* The tools themselves, mounted once each for as long as their tab is
+          open, rendered into elements the panes adopt — see toolTabs.tsx. */}
+      {consoleOpen && createPortal(
+        /* NOT keyed on the project (unlike QueryBrowser below): the console
+           owns its own project picker (1.29.0), so a switch of the IDE's own
+           project must not remount it — that would drop the picker's choice
+           and the buffer along with it. `project` only ever seeds the
+           picker's initial default. */
+        <ScriptConsole
+          project={project}
+          csrfToken={session.csrfToken}
+          canExecute={session.canExecute !== false && !readOnly}
+          activeSource={activeSource}
+          onOpenFrame={(path, line) => {
+            const entry = tree?.scripts.find((c) => c.path === path);
+            if (entry) {
+              void openScript(entry).then(() => jumpToLine(line - 1, 0));
+            }
+          }}
+        />,
+        consoleElement
+      )}
+      {queryOpen && createPortal(
+        /* Keyed on the project: the remembered datasource and buffer are per
+           viewer, not per project, but a fresh mount on switching projects
+           still avoids a run in flight outliving the project it was sent to. */
+        <QueryBrowser
+          key={project}
+          project={project}
+          csrfToken={session.csrfToken}
+          // Role only, not `readOnly` — that flag also covers an immutable
+          // PROJECT, which has no bearing on running raw SQL against a
+          // datasource; folding it in here would attribute a denial to the
+          // wrong reason.
+          isAdmin={session.writable}
+          executionEnabled={session.executionEnabled !== false}
+        />,
+        queryElement
+      )}
 
       {quickOpen !== null && (
         <QuickOpen
@@ -3872,6 +4174,8 @@ export default function Workspace({ session }: WorkspaceProps) {
           label={conflict.label}
           mine={conflict.mine}
           theirs={conflict.theirs}
+          noun={({ tag: 'tag', 'named-query': 'named query' } as Record<string, string>)[
+            docs.find((d) => d.uri === conflict.uri)?.kind ?? ''] ?? 'script'}
           busy={saving}
           onReloadTheirs={resolveReloadTheirs}
           onKeepMine={() => void resolveKeepMine()}
@@ -3929,6 +4233,7 @@ const RAIL_TITLES: Record<ViewId, string> = {
   search: 'Search',
   webdev: 'Web Dev',
   'named-queries': 'Named Queries',
+  tags: 'Tags',
 };
 
 const SINGLETON_KEYS: Record<string, string> = {

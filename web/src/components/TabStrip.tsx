@@ -55,11 +55,13 @@ export interface TabStripProps {
   presence?: ReadonlyMap<string, Peer[]>;
   /** Rendered when this pane has no documents, in place of nothing at all. */
   empty?: ReactNode;
+  /** Pane actions for the tab on screen, placed before the split button. */
+  actions?: ReactNode;
 }
 
 export default function TabStrip({
   docs, activeUri, staleUris, onSelect, onClose, onPull, onSplit, splitLabel, splitText,
-  presence, empty,
+  presence, empty, actions,
 }: TabStripProps) {
   if (docs.length === 0) return empty ? <>{empty}</> : null;
 
@@ -91,7 +93,8 @@ export default function TabStrip({
               type="button"
               aria-current={active ? 'true' : undefined}
               className="tab-label"
-              title={`${doc.project} · ${doc.path}`}
+              // A tool tab has no project or path to show.
+              title={doc.path ? `${doc.project} · ${doc.path}` : doc.typeLabel}
               onClick={() => onSelect(doc.uri)}
             >
               <span className="tab-name">
@@ -142,6 +145,7 @@ export default function TabStrip({
       </div>
       {/* Outside the tablist on purpose — see the role="presentation" note
           above; this one is never a tab at all, presentational or otherwise. */}
+      {actions}
       {onSplit && activeUri && (
         <button
           type="button"

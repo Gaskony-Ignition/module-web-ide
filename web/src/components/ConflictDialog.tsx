@@ -24,6 +24,8 @@ export interface ConflictDialogProps {
   theirs: string;
   /** Who last wrote the gateway's copy, when the server told us. */
   theirsOwner?: string;
+  /** What the tab holds, in words: "script", "named query", "tag". */
+  noun?: string;
   busy?: boolean;
   onReloadTheirs: () => void;
   onKeepMine: () => void;
@@ -35,6 +37,7 @@ export default function ConflictDialog({
   mine,
   theirs,
   theirsOwner,
+  noun = 'script',
   busy = false,
   onReloadTheirs,
   onKeepMine,
@@ -95,7 +98,7 @@ export default function ConflictDialog({
           </p>
         ) : (
           <p className="muted">
-            This script was written on the gateway after you opened it
+            This {noun} was written on the gateway after you opened it
             {theirsOwner ? ` (${theirsOwner})` : ''}. Your changes were not saved.
             {' '}
             <strong>{changed}</strong> {changed === 1 ? 'line differs' : 'lines differ'} —

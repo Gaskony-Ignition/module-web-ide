@@ -47,10 +47,11 @@ apart: an error never got far enough to have an opinion.*
 columns without leaving the query, and Copy as TSV pastes a result grid straight
 into a spreadsheet.*
 
-![The Tags tab: the default provider expanded to a folder of memory tags and a UDT instance, each atomic tag showing its value and quality inline, with the selected tag's value, a write box and its configuration JSON alongside](docs/images/tag-browser.png)
-*Live tags, read and written on the gateway itself. Values refresh only for open
-folders and only while the tab is showing; Get configuration exports a tag, folder
-or UDT as the same JSON that Create accepts.*
+![The Tags view in the side bar with a folder of memory tags and a UDT instance expanded, live values beside each tag, and the instance's Speed member open in an editor tab: a Properties form with Basic, Value and Numeric sections, the values inherited from the UDT definition shown in italic and the one override this instance makes shown with a Reset button](docs/images/tag-editor.png)
+*Tags edited the way the Designer edits them. A UDT member shows what it inherits
+from its definition in italic; change one and it becomes an override with its own
+Reset. Right-click in the tree for new, rename, duplicate, copy, paste, import and
+export.*
 
 ![The Ignition Gateway home page navigation with a Web IDE entry alongside the other installed modules](docs/images/gateway-nav.png)
 *It appears on the Gateway home page like any other module.*
@@ -65,7 +66,7 @@ or UDT as the same JSON that Create accepts.*
 | Navigation | Outline, go to definition (F12), quick open (Ctrl+P), project-wide search and replace, name-based find-references (Shift+F12), a Problems panel |
 | Web Dev | All eight HTTP methods per endpoint, per-method settings, create and delete, plus the endpoint's static HTML/JS/CSS files |
 | Database Query Browser | Pick a datasource, browse its schema-qualified tables and columns, and run ad hoc SQL with dialect-aware completion; sortable/filterable/resizable results with a cell viewer, Export CSV, auto-refresh, run-statement-under-cursor, and Save as Named Query; Stop on a long query, per-user history — Administrator only |
-| Tag Browser | Browse providers, folders, UDT definitions and instances with live value and quality; write a value, export a configuration as JSON, create from JSON (atomic, folder, UDT definition or instance) with a collision policy, delete with confirmation — Administrator only, writes audited |
+| Tags | A Designer-style tag browser in the side bar and tag editor tabs: create, rename, duplicate, copy/cut/paste, drag to move or copy, delete, write values, and import or export JSON or Designer XML. A Properties form follows the tag's value source, shows inherited UDT values with per-field Reset, and edits alarms, history, event scripts and parameters; a JSON tab shows the raw config — Administrator only, writes audited |
 | Terminal | A real shell on a real pseudo-terminal on the gateway, gated separately from execution; root where the host already allows it, never more than the host allows |
 | History | Per-user save history including the pre-edit version; unsaved buffers recovered after a crash or closed tab; console run history kept across restarts |
 | Safety rails | A save that fails to parse asks once; a save that removes or renames a function lists its call sites first |
@@ -75,7 +76,7 @@ or UDT as the same JSON that Create accepts.*
 | Authoring aids | Eighteen snippets, six new-script templates, organise imports, live tag/schema completion inside strings, seven AST-based style checks |
 | Console | ANSI colour, each run folds under its own header, export to a text file, optional timestamps |
 | Collaboration | Presence — who else has a file open, from another browser or the Designer — and read-only git status in the tree |
-| Chrome | A VS Code-shaped shell: activity bar, resizable side bar and outline, a bottom panel holding the console, the problems list and the terminal |
+| Chrome | A VS Code-shaped shell: activity bar, resizable side bar and outline, editor tabs for scripts, named queries, tags, the console and the Query Browser, and a bottom panel for problems, the terminal and tests |
 
 Breakpoint debugging is deliberately **not** included: the only serious Ignition
 debugger requires a running Designer, which defeats the point of a browser IDE.

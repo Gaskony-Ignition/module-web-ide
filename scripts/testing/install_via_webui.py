@@ -67,6 +67,10 @@ def install(page, modl: Path) -> None:
     dismiss_quick_start(page)
 
     trigger = page.get_by_role("button", name=re.compile(r"install|upgrade", re.I))
+    try:  # a loaded gateway renders this page slowly
+        trigger.first.wait_for(timeout=90000)
+    except Exception:  # noqa: BLE001
+        pass
     if not trigger.count():
         sys.exit("No 'Install or Upgrade a Module' control on the Modules page.")
     trigger.first.click()

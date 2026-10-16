@@ -14,6 +14,10 @@
   flex: 1 1 auto;
   min-width: 0;
   overflow-x: auto;
+  /* Explicit: overflow-x alone makes the other axis auto too, and a tab is a
+     pixel taller than the row's content box under its bottom rule, which drew
+     a vertical scroll bar beside the Split button. Tabs only ever scroll sideways. */
+  overflow-y: hidden;
 }
 
 .tab {
@@ -195,4 +199,39 @@
   background: var(--bg-tertiary);
   border-color: var(--accent-primary);
   color: var(--text-primary);
+}
+
+/* "Open in a new browser tab" for a Script Console or Query tab. Its own class
+   (the split button's is selected on by live suites) with the same look; it
+   takes the strip's spare room, so the split button beside it does not. */
+.tab-strip-popout {
+  margin-left: auto;
+  flex: 0 0 auto;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-height);
+  padding: 0 var(--space-3);
+  margin-right: var(--space-2);
+  background: var(--bg-primary);
+  border: var(--rule-width) solid var(--border-strong);
+  color: var(--text-secondary);
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--radius-row);
+}
+
+.tab-strip-popout-text {
+  white-space: nowrap;
+}
+
+.tab-strip-popout:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+.tab-strip-popout + .tab-strip-action {
+  margin-left: 0;
 }

@@ -37,7 +37,7 @@
  * code costs more than a missed problem, because it teaches the reader to
  * ignore the marks.
  */
-import { syntaxTree } from '@codemirror/language';
+import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import { linter, type Diagnostic } from '@codemirror/lint';
 import type { EditorState, Extension } from '@codemirror/state';
 import type { DocLanguage } from '../workspace/docLanguage';
@@ -79,6 +79,9 @@ function textAt(state: EditorState, from: number, to: number): string {
   return raw.length > 30 ? `${raw.slice(0, 30)}…` : raw;
 }
 
+/** How long one lint pass may spend finishing the parse before giving up. */
+const PARSE_BUDGET_MS = 500;
+
 /** The most marks one document may carry. See the cap in `parserProblems`. */
 const MAX_MARKS = 50;
 
@@ -90,7 +93,13 @@ const MAX_MARKS = 50;
  */
 function parserProblems(state: EditorState, language: DocLanguage): Diagnostic[] {
   const out: Diagnostic[] = [];
-  syntaxTree(state).iterate({
+  // Same trap as htmlProblems below: the tree may stop short of the end of
+  // the document (on a busy machine even a four-line stylesheet did), and the
+  // parser marks its own cut-off as an error. So ask for the whole parse, and
+  // judge only errors that end before the frontier the tree really reached.
+  const tree = ensureSyntaxTree(state, state.doc.length, PARSE_BUDGET_MS) ?? syntaxTree(state);
+  const complete = tree.length >= state.doc.length;
+  tree.iterate({
     enter: (node) => {
       // The cap is checked on the way IN and stops descending, because
       // returning false from `enter` only skips a subtree — it does not end
@@ -99,6 +108,9 @@ function parserProblems(state: EditorState, language: DocLanguage): Diagnostic[]
         return false;
       }
       if (!node.type.isError) {
+        return undefined;
+      }
+      if (!complete && node.to >= tree.length) {
         return undefined;
       }
       // A zero-width error node renders as nothing at all, so it is widened by

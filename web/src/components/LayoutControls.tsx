@@ -30,6 +30,8 @@ export interface LayoutControlsProps {
   layout: LayoutState;
   onToggle: (region: keyof LayoutState) => void;
   onReset: () => void;
+  /** Why the secondary side bar cannot show right now; disables its toggle. */
+  secondaryUnavailable?: string;
 }
 
 const REGIONS: { key: keyof LayoutState; label: string }[] = [
@@ -38,7 +40,7 @@ const REGIONS: { key: keyof LayoutState; label: string }[] = [
   { key: 'secondary', label: 'Secondary side bar' },
 ];
 
-export default function LayoutControls({ layout, onToggle, onReset }: LayoutControlsProps) {
+export default function LayoutControls({ layout, onToggle, onReset, secondaryUnavailable }: LayoutControlsProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -101,9 +103,16 @@ export default function LayoutControls({ layout, onToggle, onReset }: LayoutCont
         type="button"
         className="layout-button"
         aria-pressed={layout.secondary}
-        aria-label="Toggle secondary side bar"
-        title="Toggle secondary side bar"
-        onClick={() => onToggle('secondary')}
+        aria-disabled={secondaryUnavailable ? true : undefined}
+        aria-label={
+          secondaryUnavailable
+            ? `Toggle secondary side bar (unavailable: ${secondaryUnavailable})`
+            : 'Toggle secondary side bar'
+        }
+        title={secondaryUnavailable ? undefined : 'Toggle secondary side bar'}
+        onClick={() => {
+          if (!secondaryUnavailable) onToggle('secondary');
+        }}
       >
         <IconSideBarRight size={16} />
       </button>
@@ -117,13 +126,20 @@ export default function LayoutControls({ layout, onToggle, onReset }: LayoutCont
               type="button"
               role="menuitemcheckbox"
               aria-checked={layout[region.key]}
+              aria-disabled={region.key === 'secondary' && secondaryUnavailable ? true : undefined}
               className="layout-menu-item"
-              onClick={() => onToggle(region.key)}
+              onClick={() => {
+                if (region.key === 'secondary' && secondaryUnavailable) return;
+                onToggle(region.key);
+              }}
             >
               <span className="layout-menu-tick">
                 {layout[region.key] && <IconCheck size={13} />}
               </span>
               {region.label}
+              {region.key === 'secondary' && secondaryUnavailable && (
+                <span className="layout-menu-reason"> (unavailable: {secondaryUnavailable})</span>
+              )}
             </button>
           ))}
           <div className="layout-menu-rule" />

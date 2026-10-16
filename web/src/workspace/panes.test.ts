@@ -124,3 +124,18 @@ describe('the invariant', () => {
     }
   });
 });
+
+describe('a tool tab in the panes', () => {
+  // The rules are uri-generic; this pins that a tool's fixed uri moves and
+  // closes like any document, which is what lets it live in either pane.
+  it('moves to the other pane and back like a document', () => {
+    const state: PaneState = { activeUri: 'tool::console', otherActive: null, split: new Set() };
+    const order = ['a', 'tool::console'];
+    const moved = moveAcross(state, 'tool::console', order);
+    expect(moved.split.has('tool::console')).toBe(true);
+    expect(paneActives(moved, ['a'], ['tool::console'])).toEqual({ left: 'a', right: 'tool::console' });
+    const back = moveAcross(moved, 'tool::console', order);
+    expect(back.split.size).toBe(0);
+    expect(forgetInPanes(moved, 'tool::console').split.size).toBe(0);
+  });
+});

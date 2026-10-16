@@ -413,6 +413,9 @@ function readOnlyExtension(readOnly: boolean): Extension {
 /** The language a document is in, with the same default `surfaceFor` uses. */
 function languageOf(doc: OpenDoc): DocLanguage {
   if (doc.kind === 'named-query') return 'sql';
+  // The workspace never hands a tag here (TagEditor owns those); if one ever
+  // arrives it must at least not be treated as Python.
+  if (doc.kind === 'tag') return 'json';
   return doc.language ?? 'python';
 }
 
@@ -436,6 +439,7 @@ function offsetToPosition(text: string, offset: number): { line: number; charact
 
 function surfaceFor(doc: OpenDoc): Extension[] {
   if (doc.kind === 'named-query') return sqlSurface;
+  if (doc.kind === 'tag') return jsonSurface;
   switch (doc.language) {
     case 'html': return htmlSurface;
     case 'javascript': return javascriptSurface;

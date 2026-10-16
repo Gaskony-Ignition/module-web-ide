@@ -10,7 +10,17 @@ import {
   readOnlyReason,
   sameSignature,
   newQueryDoc,
+  newTagDoc,
+  prettyTagJson,
   settingsEqual,
+  tagDocUri,
+  tagLabel,
+  isProjectResourceDoc,
+  isToolDoc,
+  newToolDoc,
+  outlineVisible,
+  toolDocUri,
+  toolOf,
   type OpenDoc,
 } from './documents';
 
@@ -311,5 +321,97 @@ describe('isReadOnlyDoc', () => {
 
   it('leaves an ordinary local script writable', () => {
     expect(isReadOnlyDoc(scriptDoc())).toBe(false);
+  });
+});
+
+describe('tag documents', () => {
+  const doc = newTagDoc({
+    path: '[default]Line/Motor',
+    local: '{"name":"Motor","valueSource":"memory"}',
+    resolved: '{"name":"Motor","valueSource":"memory","enabled":true}',
+    signature: 'sig1',
+    tagType: 'AtomicTag',
+  });
+
+  it('is keyed apart from scripts and queries', () => {
+    expect(doc.uri).toBe('tag::[default]Line/Motor');
+    expect(doc.uri).not.toBe(docUri('', '[default]Line/Motor'));
+    expect(tagDocUri('[default]Line/Motor')).toBe(doc.uri);
+  });
+
+  it('holds pretty JSON of the local config, with the signature as its etag', () => {
+    expect(doc.text).toBe('{\n  "name": "Motor",\n  "valueSource": "memory"\n}');
+    expect(doc.baseText).toBe(doc.text);
+    expect(doc.etag).toBe('sig1');
+    expect(doc.label).toBe('Motor');
+    expect(doc.typeLabel).toBe('Tag');
+    expect(doc.tag?.resolved).toContain('"enabled": true');
+  });
+
+  it('is dirty only when the buffer moves, and is never Python or read-only', () => {
+    expect(isDirty(doc)).toBe(false);
+    expect(isDirty({ ...doc, text: doc.text + ' ' })).toBe(true);
+    expect(isPythonDoc(doc)).toBe(false);
+    expect(isReadOnlyDoc(doc)).toBe(false);
+  });
+
+  it('keeps unparseable JSON as it came and names a provider root', () => {
+    expect(prettyTagJson('{oops')).toBe('{oops');
+    expect(tagLabel('[edge]')).toBe('edge');
+    expect(tagLabel('[default]A')).toBe('A');
+  });
+});
+
+describe('tool tabs (Script Console, Query)', () => {
+  it('are singletons with fixed uris that cannot collide with a resource', () => {
+    expect(newToolDoc('console').uri).toBe(toolDocUri('console'));
+    expect(newToolDoc('query').uri).toBe('tool::query');
+    // A script in a project named "tool" still carries its data key.
+    expect(docUri('tool', 'console', 'code.py')).not.toBe(toolDocUri('console'));
+  });
+
+  it('are never dirty, never Python, never a project resource', () => {
+    for (const tool of ['console', 'query'] as const) {
+      const doc = newToolDoc(tool);
+      expect(isToolDoc(doc)).toBe(true);
+      expect(toolOf(doc)).toBe(tool);
+      expect(isDirty(doc)).toBe(false);
+      expect(isPythonDoc(doc)).toBe(false);
+      expect(isReadOnlyDoc(doc)).toBe(false);
+      expect(isProjectResourceDoc(doc)).toBe(false);
+    }
+  });
+
+  it('keep their kinds apart from the resource kinds', () => {
+    expect(newToolDoc('console').kind).toBe('console');
+    expect(newToolDoc('query').kind).toBe('query-browser');
+    expect(toolOf(scriptDoc())).toBeNull();
+    expect(toolOf(null)).toBeNull();
+    expect(isProjectResourceDoc(scriptDoc())).toBe(true);
+    expect(isProjectResourceDoc(scriptDoc({ kind: 'named-query' }))).toBe(true);
+    expect(isProjectResourceDoc(newTagDoc({
+      path: '[default]A', local: '{}', resolved: '{}', signature: 's', tagType: 'AtomicTag',
+    }))).toBe(false);
+  });
+});
+
+describe('outlineVisible', () => {
+  const tag = newTagDoc({ path: '[default]A', local: '{}', resolved: '{}', signature: 's', tagType: 'AtomicTag' });
+
+  it('shows the outline for a script when the user has it open', () => {
+    expect(outlineVisible(true, scriptDoc())).toBe(true);
+  });
+
+  it('hides it for a tag, a named query and both tools', () => {
+    expect(outlineVisible(true, tag)).toBe(false);
+    expect(outlineVisible(true, scriptDoc({ kind: 'named-query' }))).toBe(false);
+    expect(outlineVisible(true, newToolDoc('console'))).toBe(false);
+    expect(outlineVisible(true, newToolDoc('query'))).toBe(false);
+  });
+
+  it('never overrides the user closing it', () => {
+    expect(outlineVisible(false, scriptDoc())).toBe(false);
+    expect(outlineVisible(false, null)).toBe(false);
+    expect(outlineVisible(true, null)).toBe(true);
   });
 });

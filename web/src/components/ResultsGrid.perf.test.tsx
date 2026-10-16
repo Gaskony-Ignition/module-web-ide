@@ -31,6 +31,9 @@ describe('ResultsGrid perf (informational)', () => {
     // pathological regression (an accidental O(n^2) path), not real-world
     // speed — the number that decides virtualisation comes from the live
     // Playwright check against a real browser instead.
-    expect(elapsed).toBeLessThan(30_000);
-  });
+    // 90 s, not 30: alone this takes ~12 s, but sharing the machine with the
+    // full suite's eight workers it took 36 s and failed the build. An O(n^2)
+    // path over 10,000 rows would take minutes, so the guard still catches it.
+    expect(elapsed).toBeLessThan(90_000);
+  }, 120_000);
 });

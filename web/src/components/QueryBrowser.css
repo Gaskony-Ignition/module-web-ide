@@ -311,6 +311,23 @@
   min-height: 0;
 }
 
+/* One grid: the stacking cap above is for several results sharing the area.
+   Alone, the grid may take whatever height the results area has (the Query
+   tab is full height now), and only scrolls inside itself past that. Shrink,
+   never grow, so three rows don't sit in a tall empty box. */
+.qb-results.is-single > .qb-result {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.qb-results.is-single .qb-scroll {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: none;
+}
+
 .qb-result-head {
   display: flex;
   align-items: center;

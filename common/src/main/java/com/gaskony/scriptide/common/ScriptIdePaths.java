@@ -342,6 +342,13 @@ public final class ScriptIdePaths {
     public static final String ROUTE_TAGS_CONFIG = "/api/tags/config";
     public static final String ROUTE_TAGS_CREATE = "/api/tags/create";
     public static final String ROUTE_TAGS_DELETE = "/api/tags/delete";
+    public static final String ROUTE_TAGS_EDIT = "/api/tags/edit";
+    public static final String ROUTE_TAGS_SAVE = "/api/tags/save";
+    public static final String ROUTE_TAGS_MODEL = "/api/tags/model";
+    public static final String ROUTE_TAGS_RENAME = "/api/tags/rename";
+    public static final String ROUTE_TAGS_MOVE = "/api/tags/move";
+    public static final String ROUTE_TAGS_IMPORT = "/api/tags/import";
+    public static final String ROUTE_TAGS_EXPORT = "/api/tags/export";
 
     // ==================== Servlets (NOT under /data) ====================
 

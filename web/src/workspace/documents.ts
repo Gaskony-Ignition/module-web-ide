@@ -31,7 +31,7 @@ export type DocOrigin = ScriptOrigin | 'new';
  * CodeMirror surface the buffer gets, whether the language server is attached,
  * and whether the settings half of {@link isDirty} applies.
  */
-export type DocKind = 'script' | 'named-query';
+export type DocKind = 'script' | 'named-query' | 'tag' | 'console' | 'query-browser';
 
 export interface OpenDoc {
   /**
@@ -100,6 +100,38 @@ export interface OpenDoc {
    * `toResource`, which stamps version 2.
    */
   legacy?: boolean;
+  /**
+   * Tags only: what the editor shows beside the buffer. `text` is the tag's OWN
+   * overrides; `resolved` is the full configuration with inherited and default
+   * values, which the property form needs to show what an override would hide.
+   */
+  tag?: TagDocInfo;
+}
+
+export interface TagDocInfo {
+  /** `AtomicTag`, `Folder`, `UdtInstance`, `UdtType`. */
+  tagType: string;
+  /** Pretty JSON of the full configuration, as last read. */
+  resolved: string;
+  /**
+   * What each property would be with no local override — the UDT definition's
+   * value for a member or instance, empty for a standalone tag. The property
+   * form shows these, dimmed, for every property the buffer does not set.
+   */
+  inherited: Record<string, unknown>;
+}
+
+/** The editor-side half of a tag's edit read. */
+export function tagDocInfo(info: { tagType: string; resolved: string; inherited?: unknown }): TagDocInfo {
+  const inherited = info.inherited;
+  return {
+    tagType: info.tagType,
+    resolved: prettyTagJson(info.resolved),
+    // Absent from a gateway that predates the field; a non-object is not trusted.
+    inherited: inherited && typeof inherited === 'object' && !Array.isArray(inherited)
+      ? inherited as Record<string, unknown>
+      : {},
+  };
 }
 
 /**
@@ -431,4 +463,169 @@ export function newQueryDoc(params: {
 /** The tab label for a query path — its last segment. */
 export function namedQueryLabel(path: string): string {
   return path.split('/').filter(Boolean).pop() ?? path;
+}
+
+/**
+ * A tag document's key.
+ *
+ * Tags are gateway-wide, not per project, so the project segment the other
+ * kinds carry would be a lie. `tag::` cannot collide with a script or a query:
+ * those are `<project>::<resource path>`, and a resource path never starts with
+ * `[` the way every tag path does.
+ */
+export function tagDocUri(tagPath: string): string {
+  return `tag::${tagPath}`;
+}
+
+/** The data key a tag document is filed under — never sent anywhere. */
+export const TAG_DATA_KEY = 'tag.json';
+
+/**
+ * Two-space JSON, so the buffer reads the way the Designer's own JSON view does.
+ *
+ * Text that does not parse is returned as it came: a reformat must never be the
+ * thing that loses what the gateway sent.
+ */
+export function prettyTagJson(json: string): string {
+  try {
+    return JSON.stringify(JSON.parse(json), null, 2);
+  } catch {
+    return json;
+  }
+}
+
+/** A tag's leaf name — the provider's name for a provider root. */
+export function tagLabel(tagPath: string): string {
+  const close = tagPath.indexOf(']');
+  const rest = close >= 0 ? tagPath.slice(close + 1) : tagPath;
+  if (rest === '') return close > 0 ? tagPath.slice(1, close) : tagPath;
+  return rest.split('/').filter(Boolean).pop() ?? rest;
+}
+
+const TAG_TYPE_LABELS: Record<string, string> = {
+  AtomicTag: 'Tag',
+  Folder: 'Folder',
+  UdtInstance: 'UDT Instance',
+  UdtType: 'UDT Definition',
+  Provider: 'Tag Provider',
+};
+
+/** The tag's object type in words, for the tab and the editor header. */
+export function tagTypeLabel(tagType: string): string {
+  return TAG_TYPE_LABELS[tagType] ?? tagType;
+}
+
+/**
+ * True for a document that is a project resource: a script or a named query.
+ *
+ * The gate for everything that only means something for a file in a project —
+ * presence, staleness against the listing, the CodeMirror buffer. A tag is
+ * gateway-wide and a tool tab is no resource at all.
+ */
+export function isProjectResourceDoc(doc: OpenDoc): boolean {
+  return doc.kind === 'script' || doc.kind === 'named-query';
+}
+
+/**
+ * The Script Console and the Query Browser, as editor tabs.
+ *
+ * 16/10/2026: in the bottom panel both were "just too small to use", so they
+ * open beside scripts and tags, full height, in either pane. A tool tab is a
+ * document only so the tab strip and the pane rules can carry it: it has no
+ * buffer of its own (`text` and `baseText` stay empty, so it is never dirty),
+ * is never saved, and its state lives in the tool's component — see
+ * `toolTabs.tsx` for how that survives tab switches and pane moves.
+ */
+export type ToolId = 'console' | 'query';
+
+const TOOLS: Record<ToolId, { kind: DocKind; label: string; typeLabel: string }> = {
+  console: { kind: 'console', label: 'Script Console', typeLabel: 'Script Console' },
+  query: { kind: 'query-browser', label: 'Query', typeLabel: 'Database Query Browser' },
+};
+
+/**
+ * A tool tab's key. Fixed, because each tool is a singleton: a second Script
+ * Console tab would be a second REPL that looks the same and shares nothing.
+ * Two segments, so it cannot collide with a script or query, whose uris carry
+ * a third (the data key) — even in a project named `tool`.
+ */
+export function toolDocUri(tool: ToolId): string {
+  return `tool::${tool}`;
+}
+
+/** True for a Script Console or Query Browser tab. */
+export function isToolDoc(doc: OpenDoc): boolean {
+  return doc.kind === 'console' || doc.kind === 'query-browser';
+}
+
+/** Which tool a tab is, or null for a resource. */
+export function toolOf(doc: OpenDoc | null | undefined): ToolId | null {
+  if (!doc) return null;
+  if (doc.kind === 'console') return 'console';
+  if (doc.kind === 'query-browser') return 'query';
+  return null;
+}
+
+/** Build the tab for a tool. */
+export function newToolDoc(tool: ToolId): OpenDoc {
+  const spec = TOOLS[tool];
+  return {
+    uri: toolDocUri(tool),
+    kind: spec.kind,
+    // Not a project resource: the console picks its own project and the Query
+    // Browser runs against a datasource.
+    project: '',
+    path: '',
+    scriptKey: '',
+    typeLabel: spec.typeLabel,
+    label: spec.label,
+    origin: 'local',
+    etag: '',
+    baseText: '',
+    text: '',
+    overridden: false,
+  };
+}
+
+/**
+ * Whether the outline rail is on screen.
+ *
+ * The outline is the Jython symbol table, so for a query, a tag or a tool it
+ * is an empty column taking room the editor could use. The user's own
+ * open/closed choice is only READ here, never written, so it comes back as it
+ * was when a script is active again. No document at all keeps the choice too:
+ * there is nothing that the room would go to.
+ */
+export function outlineVisible(preference: boolean, active: OpenDoc | null): boolean {
+  return preference && (active === null || active.kind === 'script');
+}
+
+/** Build a document for one tag from the gateway's edit read. */
+export function newTagDoc(params: {
+  path: string;
+  local: string;
+  resolved: string;
+  signature: string;
+  tagType: string;
+  inherited?: unknown;
+}): OpenDoc {
+  const text = prettyTagJson(params.local);
+  return {
+    uri: tagDocUri(params.path),
+    kind: 'tag',
+    // No project: a tag lives in a provider, which every project shares.
+    project: '',
+    path: params.path,
+    scriptKey: TAG_DATA_KEY,
+    typeLabel: tagTypeLabel(params.tagType),
+    label: tagLabel(params.path),
+    // Tags have no project inheritance; a UDT member's inherited values are a
+    // property-level matter for the editor, not a lock on the document.
+    origin: 'local',
+    etag: params.signature,
+    baseText: text,
+    text,
+    overridden: false,
+    tag: tagDocInfo(params),
+  };
 }

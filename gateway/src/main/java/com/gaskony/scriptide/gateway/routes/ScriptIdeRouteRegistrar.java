@@ -385,6 +385,53 @@ public class ScriptIdeRouteRegistrar {
             .handler(tagRouteHandler::delete)
             .mount();
 
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_EDIT)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::edit)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_SAVE)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::save)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_MODEL)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::model)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_RENAME)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::rename)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_MOVE)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::move)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_IMPORT)
+            .method(HttpMethod.POST)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::importTags)
+            .mount();
+
+        routes.newRoute(ScriptIdePaths.ROUTE_TAGS_EXPORT)
+            .type(RouteGroup.TYPE_JSON)
+            .accessControl(admin)
+            .handler(tagRouteHandler::export)
+            .mount();
+
         // ==================== Local history and runtime errors ====================
         // Both are READS, so both take the authenticated gate rather than the
         // write one: a reader who can already open every script in the tree is

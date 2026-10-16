@@ -82,3 +82,14 @@
   margin: var(--space-1) 0;
   background: var(--border-light);
 }
+
+.layout-button[aria-disabled='true'],
+.layout-menu-item[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.layout-menu-reason {
+  margin-left: var(--space-1);
+  color: var(--text-secondary);
+}

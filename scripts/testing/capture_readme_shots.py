@@ -215,6 +215,20 @@ TAG_FOLDER = "[default]WebIDE_Line1"
 TAG_UDT = "[default]_types_/WebIDE_Motor"
 
 
+def close_second_pane(page):
+    """Close every tab in the right-hand pane, so the next shot has the whole
+    editor area — the split shot leaves one open."""
+    for _ in range(10):
+        panes = page.locator(".workspace-pane")
+        if panes.count() < 2:
+            return
+        closer = panes.nth(1).locator(".tab-close").first
+        if not closer.count():
+            return
+        closer.click()
+        page.wait_for_timeout(300)
+
+
 def capture_tag_browser(page, csrf):
     """A small line of memory tags and one UDT instance, made for the shot and
     removed after it, so the picture shows every kind of node the tree draws."""
@@ -226,26 +240,27 @@ def capture_tag_browser(page, csrf):
         api(page, "POST", "api/tags/delete", csrf, {"paths": [path]})
     api(page, "POST", "api/tags/create", csrf, {"basePath": "[default]_types_", "collision": "Overwrite",
         "json": json.dumps({"name": "WebIDE_Motor", "tagType": "UdtType",
-                            "tags": [tag("Speed", "Float8", 1450.5), tag("Running", "Boolean", True)]})})
+                            "tags": [dict(tag("Speed", "Float8", 1450.5), engUnit="rpm", engHigh=3000,
+                                     tooltip="Shaft speed", historyEnabled=True),
+                                     tag("Running", "Boolean", True)]})})
     api(page, "POST", "api/tags/create", csrf, {"basePath": "[default]", "collision": "Overwrite",
         "json": json.dumps({"name": "WebIDE_Line1", "tagType": "Folder", "tags": [
             tag("Count", "Int4", 1287), tag("Mode", "String", "Auto"), tag("Rate", "Float8", 42.75),
-            {"name": "Motor1", "tagType": "UdtInstance", "typeId": "WebIDE_Motor"}]})})
+            {"name": "Motor1", "tagType": "UdtInstance", "typeId": "WebIDE_Motor",
+             "tags": [{"name": "Speed", "tagType": "AtomicTag", "engHigh": 1800}]}]})})
     try:
+        close_second_pane(page)
         page.locator('.activity-item[aria-label="Tags"]').click()
-        page.wait_for_selector(".tb-toolbar", timeout=20000)
-        if page.locator('.panel-icon-button[aria-label="Maximise panel"]').count():
-            page.locator('.panel-icon-button[aria-label="Maximise panel"]').click()
-        page.get_by_role("button", name="Expand default", exact=True).click()
-        page.wait_for_timeout(1500)
-        page.get_by_role("button", name="Expand WebIDE_Line1", exact=True).click()
-        page.wait_for_timeout(1500)
-        page.get_by_role("button", name="Expand Motor1", exact=True).click()
-        page.wait_for_timeout(1500)
-        page.get_by_role("button", name="Count", exact=True).click()
-        page.get_by_role("button", name="Get configuration", exact=True).click()
-        page.wait_for_timeout(6000)  # one poll, so every value is drawn
-        shot(page, "tag-browser.png")
+        page.wait_for_selector("[role=tree]", timeout=20000)
+        # A UDT member, so the form shows inherited values dimmed beside the
+        # one the instance overrides.
+        for path in ("[default]", TAG_FOLDER, TAG_FOLDER + "/Motor1"):
+            page.locator(f'[role=treeitem][data-path="{path}"] .tag-tree-chevron').click()
+            page.wait_for_timeout(1500)
+        page.locator(f'[role=treeitem][data-path="{TAG_FOLDER}/Motor1/Speed"]').click()
+        page.wait_for_selector(".tag-form", timeout=20000)
+        page.wait_for_timeout(6000)  # one poll, so every value in the tree is drawn
+        shot(page, "tag-editor.png")
     finally:
         for path in (TAG_FOLDER, TAG_UDT):
             api(page, "POST", "api/tags/delete", csrf, {"paths": [path]})
@@ -374,11 +389,11 @@ with sync_playwright() as p:
     # Against a real configured datasource, not the script fixtures above: the
     # Query Browser runs ad hoc SQL over whatever JDBC connection the gateway
     # has, so this shot means nothing without real rows on the other end.
-    # Maximising the panel hides the (now irrelevant) code editor and gives the
-    # schema tree, the SQL and the result grid the full height to be readable.
+    # It opens as an editor tab, so the schema tree, the SQL and the result grid
+    # already have the full height.
+    close_second_pane(page)
     page.locator('.activity-item[aria-label="Query"]').click()
     page.wait_for_selector(".qb-toolbar", timeout=20000)
-    page.locator('.panel-icon-button[aria-label="Maximise panel"]').click()
     page.wait_for_timeout(500)
     page.select_option(".qb-toolbar select", QUERY_DATASOURCE)
     page.wait_for_selector(f'.qb-table-name:text-is("{QUERY_TABLE}")', timeout=15000)

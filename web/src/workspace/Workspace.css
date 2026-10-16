@@ -418,3 +418,27 @@
 .workspace-panes.is-split > .workspace-pane + .workspace-pane {
   border-left: 1px solid var(--border);
 }
+
+/* ---- tool tabs (16/10/2026) ---------------------------------------------
+ *
+ * A Script Console or Query tab: the slot takes the pane's full height under
+ * the tab strip, and the tool's element (moved between slots, never
+ * remounted — see toolTabs.tsx) fills it. Neither scrolls: the console and
+ * the Query Browser each own their scroll surfaces. */
+.tool-tab-slot {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.tool-tab-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}

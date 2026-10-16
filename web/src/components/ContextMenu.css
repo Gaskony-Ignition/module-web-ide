@@ -53,3 +53,9 @@
   color: var(--text-muted);
   cursor: default;
 }
+
+/* The Tags menu has twenty items; at the usual padding it is taller than a
+   1366x640 window and the last ones cannot be reached. */
+.context-menu.is-dense .context-menu-item {
+  padding: var(--space-1) var(--space-3);
+}

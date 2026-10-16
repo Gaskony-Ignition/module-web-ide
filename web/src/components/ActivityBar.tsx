@@ -12,9 +12,11 @@
  * scrolling column stops being navigable.
  *
  * The lower group is different in kind and is separated by the gap between them:
- * those two open the bottom PANEL rather than the side bar. Script Console used
- * to be a row in the script tree, where it read as a script among scripts;
- * It was asked to move out of the tree once it had an icon of its own.
+ * those open the bottom PANEL, or a tool tab, rather than the side bar. Script
+ * Console used to be a row in the script tree, where it read as a script among
+ * scripts; it was asked to move out of the tree once it had an icon of its own.
+ * Since 16/10/2026 it and Query open as editor TABS — in the bottom panel both
+ * were "just too small to use" — but their buttons stay where they were.
  *
  * Search arrived in 1.6.0 and the view behind it is real: it searches every
  * Project Library script on the gateway through `scriptide/searchText`, and it
@@ -30,13 +32,14 @@ import {
   IconTag,
   IconTerminal,
 } from './Icons';
+import type { ToolId } from '../workspace/documents';
 import './ActivityBar.css';
 
 /** Side-bar views. */
-export type ViewId = 'scripts' | 'search' | 'webdev' | 'named-queries';
+export type ViewId = 'scripts' | 'search' | 'webdev' | 'named-queries' | 'tags';
 
 /** Bottom-panel views. */
-export type PanelId = 'console' | 'query' | 'problems' | 'terminal' | 'tests' | 'tags';
+export type PanelId = 'problems' | 'terminal' | 'tests';
 
 export interface ActivityBarProps {
   /** The side-bar view, whether or not the side bar is showing. */
@@ -47,6 +50,10 @@ export interface ActivityBarProps {
   /** The panel tab, or null when the panel is closed. */
   activePanel: PanelId | null;
   onSelectPanel: (panel: PanelId) => void;
+  /** The tool whose tab is the active one, or null. */
+  activeTool: ToolId | null;
+  /** Open the tool's tab, or focus it if it is already open. */
+  onSelectTool: (tool: ToolId) => void;
 }
 
 const VIEWS: Array<{ id: ViewId; label: string; icon: ReactNode }> = [
@@ -54,26 +61,32 @@ const VIEWS: Array<{ id: ViewId; label: string; icon: ReactNode }> = [
   { id: 'search', label: 'Search', icon: <IconSearch size={20} /> },
   { id: 'webdev', label: 'Web Dev', icon: <IconGlobe size={22} /> },
   { id: 'named-queries', label: 'Named Queries', icon: <IconDatabase size={20} /> },
+  // A side-bar view, not a panel: a tag opens in an editor tab like a script
+  // does (15/10/2026 — the 1.30.7 bottom-panel browser was "useless").
+  { id: 'tags', label: 'Tags', icon: <IconTag size={20} /> },
 ];
 
-const PANELS: Array<{ id: PanelId; label: string; icon: ReactNode }> = [
-  { id: 'problems', label: 'Problems', icon: <IconAlert size={19} /> },
-  { id: 'console', label: 'Script Console', icon: <IconPlay size={18} /> },
+/** The lower group, in screen order: panel tabs and tool tabs mixed. */
+type LowerItem =
+  | { kind: 'panel'; id: PanelId; label: string; icon: ReactNode }
+  | { kind: 'tool'; id: ToolId; label: string; icon: ReactNode };
+
+const LOWER: LowerItem[] = [
+  { kind: 'panel', id: 'problems', label: 'Problems', icon: <IconAlert size={19} /> },
+  { kind: 'tool', id: 'console', label: 'Script Console', icon: <IconPlay size={18} /> },
   // Next to the console: the same "run something on the gateway" kind of
-  // panel, just SQL instead of Jython. Reuses IconDatabase from the side-bar
+  // tool, just SQL instead of Jython. Reuses IconDatabase from the side-bar
   // view list above — a different UI context, so reusing it here is not the
   // shared-CSS-class trap; two icon lists showing the same glyph is fine.
-  { id: 'query', label: 'Query', icon: <IconDatabase size={19} /> },
-  { id: 'terminal', label: 'Terminal', icon: <IconTerminal size={22} /> },
+  { kind: 'tool', id: 'query', label: 'Query', icon: <IconDatabase size={19} /> },
+  { kind: 'panel', id: 'terminal', label: 'Terminal', icon: <IconTerminal size={22} /> },
   // Next to the console rather than in the side bar: a test result is OUTPUT,
   // read after asking for something, with the editor still on screen.
-  { id: 'tests', label: 'Tests', icon: <IconFlask size={20} /> },
-  // Beside the query browser: the same "look at live gateway data" job, for tags.
-  { id: 'tags', label: 'Tags', icon: <IconTag size={19} /> },
+  { kind: 'panel', id: 'tests', label: 'Tests', icon: <IconFlask size={20} /> },
 ];
 
 export default function ActivityBar({
-  active, expanded, onSelect, activePanel, onSelectPanel,
+  active, expanded, onSelect, activePanel, onSelectPanel, activeTool, onSelectTool,
 }: ActivityBarProps) {
   return (
     <nav className="activity-bar" aria-label="Views">
@@ -100,19 +113,19 @@ export default function ActivityBar({
 
       <span className="activity-spacer" />
 
-      {PANELS.map((panel) => {
-        const isActive = panel.id === activePanel;
+      {LOWER.map((item) => {
+        const isActive = item.kind === 'panel' ? item.id === activePanel : item.id === activeTool;
         return (
           <button
-            key={panel.id}
+            key={item.id}
             type="button"
             className={`activity-item${isActive ? ' is-active' : ''}`}
             aria-pressed={isActive}
-            aria-label={panel.label}
-            title={panel.label}
-            onClick={() => onSelectPanel(panel.id)}
+            aria-label={item.label}
+            title={item.label}
+            onClick={() => (item.kind === 'panel' ? onSelectPanel(item.id) : onSelectTool(item.id))}
           >
-            {panel.icon}
+            {item.icon}
           </button>
         );
       })}

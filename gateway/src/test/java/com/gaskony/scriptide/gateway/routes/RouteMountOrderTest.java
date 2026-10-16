@@ -148,7 +148,14 @@ class RouteMountOrderTest {
             ScriptIdePaths.ROUTE_TAGS_WRITE,
             ScriptIdePaths.ROUTE_TAGS_CONFIG,
             ScriptIdePaths.ROUTE_TAGS_CREATE,
-            ScriptIdePaths.ROUTE_TAGS_DELETE)) {
+            ScriptIdePaths.ROUTE_TAGS_DELETE,
+            ScriptIdePaths.ROUTE_TAGS_EDIT,
+            ScriptIdePaths.ROUTE_TAGS_SAVE,
+            ScriptIdePaths.ROUTE_TAGS_MODEL,
+            ScriptIdePaths.ROUTE_TAGS_RENAME,
+            ScriptIdePaths.ROUTE_TAGS_MOVE,
+            ScriptIdePaths.ROUTE_TAGS_IMPORT,
+            ScriptIdePaths.ROUTE_TAGS_EXPORT)) {
             assertThat(mounted).as("%s was never mounted", route).contains(route);
             assertThat(mounted.indexOf(route))
                 .as("%s is mounted after the catch-all and is therefore unreachable", route)
