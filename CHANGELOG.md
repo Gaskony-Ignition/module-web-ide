@@ -26,6 +26,7 @@ Tags are now edited the way the Designer edits them, and the console and Query B
   - The conflict dialog said "script" for every kind of tab.
   - A single query result grid now uses the Query tab's full height instead of a 320px window.
   - CSS, JavaScript, JSON and SQL syntax checks no longer report an error on valid code when the editor's background parse hasn't reached the end of the file (seen on a busy machine).
+  - Every embedded code editor (console, Query, tag JSON, event scripts) showed CodeMirror's own near-invisible dark dotted focus ring inside the real one. That ring is off now, and the tag JSON view and event-script editors get the accent focus ring the console and Query editor already had.
 
 ## [1.30.7] — 2026-10-15
 

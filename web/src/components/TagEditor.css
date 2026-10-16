@@ -127,3 +127,10 @@
 .tag-doc-buffer .cm-editor {
   height: 100%;
 }
+
+/* The ring for the CodeMirror editor inside: editorTheme turns CodeMirror's
+   own off, as .code-editor-host and .console-editor do. */
+.tag-doc-buffer:focus-within {
+  outline: 1px solid var(--accent-primary);
+  outline-offset: -1px;
+}

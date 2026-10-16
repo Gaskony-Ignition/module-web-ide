@@ -80,6 +80,11 @@ export const editorTheme = EditorView.theme(
     },
     '.cm-activeLine': { backgroundColor: 'var(--bg-tertiary)' },
     '.cm-activeLineGutter': { backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' },
+    // CodeMirror's own focus ring is a 1px dark dotted line (#212121) — next
+    // to invisible on these grounds, and innermost, so it is the ring a
+    // keyboard user (and the a11y gate) actually meets. Every host draws its
+    // own accent ring with :focus-within instead.
+    '&.cm-focused': { outline: 'none' },
     '&.cm-focused .cm-cursor': { borderLeftColor: 'var(--accent-primary)' },
     '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, ::selection': {
       backgroundColor: 'var(--accent-primary-bg)',
