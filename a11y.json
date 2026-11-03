@@ -1,6 +1,6 @@
 {
   "_comment": "web URLs are absolute: replace GATEWAY with the test gateway host before running a11y-gate.sh",
-  "gateway": "module-testing",
+  "gateway": "rig",
   "web": [
     "http://GATEWAY:8088/data/scriptide/",
     "http://GATEWAY:8088/data/scriptide/?view=console&project=Template",
