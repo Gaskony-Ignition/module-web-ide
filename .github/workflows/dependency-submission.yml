@@ -2,6 +2,8 @@ name: Dependency submission
 
 # Dependabot can't read Gradle files, so this resolves the Gradle dependencies
 # and submits them to the dependency graph; Java alerts then arrive like npm ones.
+# runtimeClasspath only: it is what the .modl bundles. compileOnly (the Ignition SDK)
+# comes from the gateway, and including it buries the real alerts under the gateway's.
 on:
   push:
     branches: [main]
@@ -27,3 +29,5 @@ jobs:
           java-version: '17'
 
       - uses: gradle/actions/dependency-submission@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+        with:
+          dependency-graph-include-configurations: '^runtimeClasspath$'
