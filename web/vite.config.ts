@@ -24,6 +24,6 @@ export default defineConfig({
     // the main process and it then fails its own RPC — reported as a red build
     // with a green test list, which is the worst possible failure mode for the
     // check that gates every release. Learned on web-designer 14/08/2026.
-    poolOptions: { threads: { maxThreads: 8 } },
+    maxWorkers: 8,
   },
 });
