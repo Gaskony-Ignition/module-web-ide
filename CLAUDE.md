@@ -2,10 +2,6 @@
 
 Module ID `com.gaskony.scriptide` · Repo `Gaskony-Ignition/module-web-ide`
 
-Read the workspace's `modules/CLAUDE.md` first for the suite-wide rules
-(signing, dependency boundaries, Gradle/Java versions, skills). This file
-covers only what is specific to this module.
-
 ## What it is
 
 A browser-based Jython IDE for Ignition 8.3, served from the Gateway: Project
@@ -15,8 +11,8 @@ Gateway, and project-wide navigation (go-to-definition, quick open, search
 and replace, name-based references, a Problems panel).
 
 **Public under Apache-2.0**, and on the modules portal. Release with
-`./release.sh ignition-module-web-ide`; still built with its own
-`./gradlew` and still outside `test-all.sh`.
+`./release.sh ignition-module-web-ide`; built with its own `./gradlew`,
+outside `test-all.sh`.
 
 ## Entry points
 
