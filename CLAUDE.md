@@ -10,9 +10,9 @@ gateway, live error checking, an outline, a script console executing on the
 Gateway, and project-wide navigation (go-to-definition, quick open, search
 and replace, name-based references, a Problems panel).
 
-**Public under Apache-2.0**, and on the modules portal. Release with
-`./release.sh ignition-module-web-ide`; built with its own `./gradlew`,
-outside `test-all.sh`.
+**Public under Apache-2.0**, and on the modules portal. Release from
+`modules/` with `./release.sh ignition-module-web-ide`; `modules/test-all.sh`
+builds and tests it with the other released modules.
 
 ## Entry points
 
