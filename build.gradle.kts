@@ -1,8 +1,8 @@
 plugins {
     base
     id("io.ia.sdk.modl") version "0.5.0"
-    id("com.github.spotbugs") version "6.4.8" apply false
-    id("org.owasp.dependencycheck") version "12.2.0" apply false
+    id("com.github.spotbugs") version "6.5.13" apply false
+    id("org.owasp.dependencycheck") version "13.0.0" apply false
 }
 
 // ── OWASP Dependency Check ──────────────────────────────────────────────────
@@ -13,7 +13,7 @@ configure<org.owasp.dependencycheck.gradle.extension.DependencyCheckExtension> {
     analyzers.assemblyEnabled = false
 }
 
-version = "2.0.0"
+version = "2.0.1"
 group = "com.gaskony"
 
 allprojects {
@@ -59,9 +59,18 @@ subprojects {
         apply(plugin = "com.github.spotbugs")
 
         configure<CheckstyleExtension> {
-            toolVersion = "10.26.1"
+            toolVersion = "14.4.0"
             configFile = rootProject.file("config/checkstyle/checkstyle.xml")
             isIgnoreFailures = true
+        }
+
+        // Checkstyle 11+ runs only on Java 21+. Only the Checkstyle worker uses this
+        // toolchain; compilation and the shipped bytecode stay on the Java 17 toolchain.
+        val checkstyleLauncher = the<JavaToolchainService>().launcherFor {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+        tasks.withType<Checkstyle>().configureEach {
+            javaLauncher.set(checkstyleLauncher)
         }
 
         configure<com.github.spotbugs.snom.SpotBugsExtension> {

@@ -763,10 +763,7 @@ public final class DockerExec {
                 readHeaders(in);
                 // Drain to EOF: the stream closes when the sweep exits, so this
                 // is the completion signal.
-                byte[] scratch = new byte[512];
-                while (in.read(scratch) != -1) {
-                    // discarded
-                }
+                in.transferTo(OutputStream.nullOutputStream());
             } finally {
                 watchdog.cancel(false);
             }

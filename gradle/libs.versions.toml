@@ -6,7 +6,7 @@ ignition = "8.3.0"
 # jars contain ZERO com/google/gson references (IA use a shaded fork), and the
 # default dataroutes ResponseRenderer is Object::toString, so no Gson type ever
 # crosses an SDK boundary. See gateway/build.gradle.kts for the full rationale.
-gson = "2.14.0"
+gson = "2.15.0"
 
 # JGit, for READING a project's git status. Core only — deliberately NOT
 # org.eclipse.jgit.ssh.apache, which the sibling git module ships: this module
@@ -17,7 +17,7 @@ gson = "2.14.0"
 # Shipped rather than compileOnly because the Gateway bundles no JGit, and the
 # rig runs a STOCK image with no `git` binary at all — reading .git in pure Java
 # is the only route that does not require changing the image.
-jgit = "6.10.1.202505221210-r"
+jgit = "7.8.1.202611041320-r"
 
 # Matches the EE10 gateway runtime (jakarta.servlet-api 6.0.0 ships in
 # lib/core/gateway on 8.3.x).
@@ -50,11 +50,11 @@ jetty = "12.0.34"
 jython = "2.7.3.5"
 
 junit-jupiter = "5.14.4"
-# Gradle 8.10.2 bundles a junit-platform-launcher too old for jupiter >= 5.12;
-# without this explicit pin, discovery fails with "OutputDirectoryCreator not
-# available". Keep in lockstep with junit-jupiter's platform line.
+# Gradle 9 no longer puts a junit-platform-launcher on the test runtime
+# classpath, and a misaligned one fails discovery with "OutputDirectoryCreator
+# not available". Keep in lockstep with junit-jupiter's platform line.
 junit-platform = "1.14.4"
-mockito = "5.23.0"
+mockito = "5.24.0"
 assertj = "3.27.7"
 
 # BOUNDARY LIBRARY — compileOnly, pinned to the platform, never shipped.
@@ -66,6 +66,9 @@ assertj = "3.27.7"
 # (Note web-designer sits at 2.0.18, which exceeds the platform and is a latent
 # violation of the estate rule in modules/CLAUDE.md — do not copy that.)
 slf4j = "2.0.12"
+# slf4j-simple is a TEST-ONLY backend (testRuntimeOnly), never shipped, so it
+# tracks latest stable independently of the compileOnly pin above.
+slf4j-simple = "2.0.20"
 
 [libraries]
 ignition-common = { module = "com.inductiveautomation.ignitionsdk:ignition-common", version.ref = "ignition" }
@@ -85,4 +88,4 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
-slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j" }
+slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4j-simple" }

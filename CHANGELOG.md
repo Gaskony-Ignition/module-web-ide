@@ -2,6 +2,17 @@
 
 All notable changes to this module (Script IDE until 1.28.0). Format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.1] — 2026-11-25
+
+Dependencies upgraded to latest stable. No change in behaviour.
+
+- **Build:** Gradle wrapper 8.10.2 → 9.9.2 (`io.ia.sdk.modl` stays 0.5.0, the latest); SpotBugs plugin 6.4.8 → 6.5.13; OWASP dependency-check plugin 12.2.0 → 13.0.0; Checkstyle 10.26.1 → 14.4.0, which needs Java 21, so only the Checkstyle tasks run on a 21 toolchain and compilation stays on 17; JaCoCo 0.8.11 → 0.8.16.
+- **Shipped:** JGit 6.10.1.202505221210-r → 7.8.1.202611041320-r; Gson 2.14.0 → 2.15.0 (error_prone_annotations 2.48.0 → 2.50.0 with it).
+- **Test:** Mockito 5.23.0 → 5.24.0; slf4j-simple 2.0.12 → 2.0.20, now on its own version line since it is test-only — the compileOnly `slf4j-api` stays on the platform's 2.0.12.
+- **Web:** Vite 6 → 8, @vitejs/plugin-react 4 → 6, TypeScript 5.9 → 7.0, jsdom 26 → 31, @testing-library/jest-dom 6 → 8, @testing-library/dom 10.4.2 declared (peer of @testing-library/react 16), @types/node 26.6, CodeMirror and Lezer minor/patch updates. React stays on 18.3.1.
+- `tsconfig.app.json` now includes `vite/client` types: TypeScript 7 checks side-effect imports, so every `.css` import needed a declaration.
+- SpotBugs 4.10 flagged the drain loop in `DockerExec.runDetachedControlExec` (unchecked `read(byte[])`); it now drains with `transferTo(OutputStream.nullOutputStream())`.
+
 ## [2.0.0] — 2026-10-16
 
 Tags are now edited the way the Designer edits them, and the console and Query Browser get the whole editor area.

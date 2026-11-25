@@ -31,7 +31,9 @@ describe('transfer client urls', () => {
   // The RESOLVED url, not merely that fetch was called: a mocked fetch accepts
   // any string, and three routes shipped to the rig broken that way at 1.15.0.
   it('resolves the export route through apiUrl, with one path parameter each', async () => {
-    fetchMock.mockResolvedValue(new Response(new Blob(['zip']), { status: 200 }));
+    // A string body, not new Blob([...]): jsdom's Blob has no stream(), and
+    // from jsdom 31 Node's Response recognises it as a Blob and calls stream().
+    fetchMock.mockResolvedValue(new Response('zip', { status: 200 }));
     await exportScripts('MyProject', ['a/b', 'c/d']);
     expect(calledUrl().startsWith(apiUrl('/api/scripts/export'))).toBe(true);
     // Repeated, never delimited — a resource path already contains slashes and
